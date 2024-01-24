@@ -1,26 +1,17 @@
-/*
- Name:		ESP32MIDI.ino
- Created:	5/6/2022 6:17:48 PM
- Author:	Dr. G
-*/
 
 #include <Arduino.h>
-//#include <Control_Surface.h>//an alternate MIDI library, but is not compatible with the STM32 (I originally inteded to use an ESP32)
 #include "configuration.h"
-//#include "SendRecTest.h"
-#include "SparkfunTest.h"
+#include "Radio.h"
 
 unsigned long MillisecondTicks{};
 unsigned long MicrosecondTicks{};
 unsigned long LastMillisecondTicks{};//previous values
 unsigned long LastMicrosecondTicks{};
 
-//for STM32 boards, Serial is Serial1
-//#ifdef USING_STM32
-//MIDI_CREATE_INSTANCE(HardwareSerial, Serial1, MIDI);
-//#else
-//MIDI_CREATE_INSTANCE(HardwareSerial, Serial, MIDI);
-//#endif
+
+RadioHandler* transmitter;
+
+
 
 
 //System clock
@@ -39,7 +30,20 @@ void GetTicks(void)
 void setup() {
 
     //pinMode(LED_BUILTIN, OUTPUT);
-    setupFunc();
+
+
+    auto startup_settings = radio_handler_config_datapack_t
+    {
+        SLAVE_PIN,
+        IRQ_PIN,
+        FREQUENCY,
+        MYNODEID,
+        NETWORKID,
+        IS_HIGH_POWER,
+        ENCRYPT,
+        ENCRYPTKEY,
+    };
+    transmitter = new RadioHandler(startup_settings);
 }
 
 
@@ -52,16 +56,18 @@ void loop() {
     {
         LiteOn = true;//only for one tick
 
-        //digitalWrite(LED_BUILTIN, LiteOn);
-        //Serial.println(LiteOn);
+        remote_control_packet_t packet_out = {};
+        packet_out.channels[0] = 1280;
+        
+        transmitter->SendRCPacket(packet_out, TONODEID, USEACK);
 
     }
 
-    loopFunc(LiteOn);
-    //loopFunc(LiteOn);
-    //Serial.print(LiteOn);
+    packet_type_t gpack = PACKET_NULL;
+    transmitter->CheckForResponse(&gpack);
 
-
+    if(gpack != PACKET_NULL)
+        Serial.printf("%d\n", transmitter->GetLastControlPacket().channels[0]);
 
 }
 

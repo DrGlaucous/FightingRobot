@@ -14,3 +14,33 @@
 //};
 //#endif
 
+
+// Addresses for this node. CHANGE THESE FOR EACH NODE!
+
+#define NETWORKID     0   // Must be the same for all nodes
+#define MYNODEID      1   // My node ID
+#define TONODEID      2   // Destination node ID
+
+
+//#define FREQUENCY   RF69_433MHZ
+#define FREQUENCY     RF69_915MHZ
+#define IS_HIGH_POWER true
+
+
+//pins for the radio
+#define SLAVE_PIN PA4
+#define IRQ_PIN PB4
+
+
+
+#define ENCRYPT       true // Set to "true" to use encryption
+#define ENCRYPTKEY    "TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
+
+
+
+// Use ACKnowledge when sending messages (or not):
+#define USEACK        true // Request ACKs or not
+
+//for processing and sending out remote control channel data
+#define CHANNEL_COUNT 12
+#define USE_INVERTED_PPM true
