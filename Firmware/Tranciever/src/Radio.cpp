@@ -91,7 +91,7 @@ int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, boo
 {
     if(ack)
     {
-        if(radio.sendWithRetry(destination, &packet, size))
+        if(radio.sendWithRetry(destination, packet, size))
         {
             //got ack
             return 0; //success
@@ -104,7 +104,7 @@ int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, boo
     }
     else
     {
-        radio.send(destination, &packet, size);
+        radio.send(destination, packet, size);
         return 0; //success
     }
 

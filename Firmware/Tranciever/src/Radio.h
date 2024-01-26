@@ -13,6 +13,9 @@ typedef enum packet_type_e
 }packet_type_t;
 
 //packet sent from the controller to the machine
+
+// To force compiler to use 1 byte packaging 
+//#pragma pack(1) 
 typedef struct remote_control_packet_s
 {
     packet_type_t packettype;

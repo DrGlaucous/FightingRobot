@@ -4,7 +4,7 @@
 #include <stdint.h>
 
 
-#define PI 3.1415926535
+#define PI 3.14159265358979
 
 
 /*
@@ -36,18 +36,18 @@ PI------------0
 
 
 
-Char Unit circle, radius +-256
+Char Unit circle, radius +-512
 
 
-       64
-       |
-       |
-       |
-128------------0
-       |
-       |
-       |
       192
+       |
+       |
+       |
+0------------128
+       |
+       |
+       |
+       64
 
 
 */
@@ -58,7 +58,7 @@ class FastTrig
 public:
 
 	//don't ask where I got this class...
-
+	//...CSE2. it was CSE2.
 
     //constructor and destructor
     FastTrig()
@@ -78,13 +78,14 @@ public:
         return gSin[deg];
     }
 
-	unsigned char GetArktan(int x, int y)
+	unsigned char GetArctan(int x, int y)
 	{
 		short k;
 		unsigned char a;
 
-		x *= -1;
-		y *= -1;
+		//use these to get coordiantes that work better with the screen coordiante system, where 0,0 is top left
+		//x *= -1;
+		//y *= -1;
 
 		a = 0;
 
@@ -170,14 +171,14 @@ public:
 	}
 
 
-	float ConvertBackToRadians(unsigned char deg)
+	static float ConvertBackToRadians(unsigned char deg)
 	{
 		return (deg * 6.2831998 / 256.0);
 	}
 
-	unsigned char ConvertToFastDegs(float radians)
+	static unsigned char ConvertToFastDegs(float radians)
 	{
-		return (unsigned char)floor(radians * 256 / (2 * PI));
+		return (unsigned char)floor(radians * 256.0 / (2.0 * PI));
 	}
 
 
@@ -224,18 +225,20 @@ private:
 
 
 
-void setWheelSpeedProportions(float* wheel_1, float* wheel_2, float* wheel_3, float angle)
+void setWheelSpeedProportions(int* wheel_1, int* wheel_2, int* wheel_3, int x, int y)
 {
-    //float x_componet = cos(angle);
-    //float y_componet = sin(angle);
+	//this is not faster if we have to initialize the entire class each time the funciton is called, but it works as a proof-of-concept for later
+	FastTrig mr_trig;
+	unsigned char angle = mr_trig.GetArctan(x, y);
+	*wheel_1 = mr_trig.GetCos(angle);
+	*wheel_2 = mr_trig.GetCos(angle + 512 / 3); //values are not exact, but are close enough in terms of integer offset
+	*wheel_3 = mr_trig.GetCos(angle + 256 / 3);
 
-	FastTrig mrQuick;
-
-
-
-    *wheel_1 = cos(angle);
-    *wheel_2 = cos(angle + 4 * PI / 3.0);
-    *wheel_3 = cos(angle + 2 * PI / 3.0);
+	
+	//traditional trig method:
+	//*wheel_1 = cos(angle);
+    //*wheel_2 = cos(angle + 4 * PI / 3.0);
+    //*wheel_3 = cos(angle + 2 * PI / 3.0);
 
 }
 
@@ -243,15 +246,16 @@ void setWheelSpeedProportions(float* wheel_1, float* wheel_2, float* wheel_3, fl
 
 int main(void)
 {
-    float angle = PI/2.0;// PI / 3;
-    float wheel_1;
-    float wheel_2;
-    float wheel_3;
-    setWheelSpeedProportions(&wheel_1, &wheel_2, &wheel_3, angle);
+	int x_vec = 0;
+	int y_vec = 10;
+
+    int wheel_1;
+	int wheel_2;
+	int wheel_3;
+    setWheelSpeedProportions(&wheel_1, &wheel_2, &wheel_3, x_vec, y_vec);
 
 
-
-    float stopper = angle + 1.0;
+    float stopper = x_vec + 1.0;
 
     return 1;
 
