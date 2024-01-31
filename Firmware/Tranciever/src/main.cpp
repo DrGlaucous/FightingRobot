@@ -12,6 +12,27 @@ TransmitterHandler gTransmitter;
 ReceiverHandler gReceiver;
 #endif
 
+#ifdef MODE_DEBUG
+#include "Test.h"
+
+
+Tester ttest;
+
+void setup() {
+
+}
+
+
+void loop() {
+    
+    gTimer.update();
+
+    ttest.update();
+
+}
+#else
+
+
 
 
 void setup() {
@@ -36,4 +57,8 @@ void loop() {
 
 
 }
+
+#endif
+
+
 

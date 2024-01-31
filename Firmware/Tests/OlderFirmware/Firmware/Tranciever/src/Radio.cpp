@@ -15,7 +15,6 @@ RadioHandler::RadioHandler(radio_handler_config_datapack_t settings)
     radio.setIrq(settings.irq_pin);
     radio.initialize(settings.frequency, settings.this_id, settings.network_id);
 
-
     if(settings.should_encrypt)
         radio.encrypt(settings.encrypt_key);
 }
@@ -105,7 +104,7 @@ int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, boo
     }
     else
     {
-        radio.send(destination, packet, size);
+        radio.send(destination, &packet, size);
         return 0; //success
     }
 

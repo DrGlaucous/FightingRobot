@@ -1,0 +1,9 @@
+this was taken from sub commit:
+
+073b8aa
+
+FightingRobot-073b8aaa625c691ad54e7b07a4855fe6e9bbc530
+
+
+
+this firmware sucessfully transmits packets
