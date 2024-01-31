@@ -52,14 +52,14 @@ void loop() {
     GetTicks();
 
     int LiteOn  = false;
-    if(MillisecondTicks % 500 == 0 && MillisecondTicks != LastMillisecondTicks)
+    if(MillisecondTicks % 5 == 0 && MillisecondTicks != LastMillisecondTicks)
     {
         LiteOn = true;//only for one tick
 
         remote_control_packet_t packet_out = {};
         packet_out.channels[0] = 1280;
 
-        Serial.printf("AA\n");
+        //Serial.printf("AA\n");
         
         transmitter->SendRCPacket(packet_out, TONODEID, USEACK);
 
