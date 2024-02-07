@@ -1,0 +1,37 @@
+hardware SPI on an ESP32:
+default:
+
+VSPI:
+MOSI 23
+MISO 19
+SCLK 18
+CS 5
+
+HSPI
+MOSI 13
+MISO 12
+SCLK 14
+CS 15
+
+in arduino IDE, these are defined as their respective names
+(note: these pins can be changed)
+
+
+to change SPI pins manually in a library that doesn't support custom initialization, use:
+SPI.begin(SCK, MISO, MOSI, SS);
+
+
+for multiple SPI busses, initialize
+vspi = new SPIClass(VSPI);
+hspi = new SPIClass(HSPI);
+
+see more:
+https://randomnerdtutorials.com/esp32-spi-communication-arduino/
+
+
+on top and bottom walls, other robots use 1.5-2mm thick shells
+
+(we could probably do this for the internal structure as well)
+
+for edge walls, 3-5mm will suffice (put curves so the robot cannot sit on them)
+
