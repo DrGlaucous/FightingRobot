@@ -36,13 +36,12 @@
 #define CHANNEL_COUNT 12
 
 //what end of the stick the firmware is on
-//#define IS_CONTROLLER
+#define IS_CONTROLLER
 
 
 //settings specific to the transmitter
+
 #ifdef IS_CONTROLLER
-
-
     //trigger on falling edge instead of rising edge (for futaba's weird 12 channel format)
     #define PPM_IS_INVERTED true
 
@@ -55,5 +54,4 @@
     //something
     #define KAKAJAMANGA
 #endif
-
 

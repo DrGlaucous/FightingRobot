@@ -15,18 +15,18 @@ typedef enum packet_type_e
 //packet sent from the controller to the machine
 
 // To force compiler to use 1 byte packaging 
-//#pragma pack(1) 
+#pragma pack(1) 
 typedef struct remote_control_packet_s
 {
-    packet_type_t packettype;
-    uint16_t channels[CHANNEL_COUNT];
+    packet_type_t packettype = PACKET_CONTROL_VALUES;
+    uint16_t channels[CHANNEL_COUNT] = {};
 }remote_control_packet_t;
 
 //packet sent from the machine to the controller
 typedef struct remote_response_packet_s
 {
-    packet_type_t packettype;
-    uint16_t hi_there;
+    packet_type_t packettype = PACKET_RESPONSE_VALUES;
+    uint16_t hi_there = 0;
 }remote_response_packet_t;
 
 //all the settings for configuring the radio
@@ -49,8 +49,7 @@ class RadioHandler
     RadioHandler(radio_handler_config_datapack_t settings);
     ~RadioHandler();
 
-    int SendRCPacket(remote_control_packet_t packet, uint8_t destination, bool ack);
-    int SendResponsePacket(remote_response_packet_t packet, uint8_t destination, bool ack);
+    int SendPacket(remote_control_packet_t packet, uint8_t destination, bool ack);
 
     int CheckForResponse(packet_type_t* gotten_packet = NULL);
 
@@ -59,7 +58,13 @@ class RadioHandler
 
     private:
 
-    int SendPacket(void* packet, size_t size, uint8_t destination, bool ack);
+    //int SendPacket(void* packet, size_t size, uint8_t destination, bool ack);
+
+    //only used to send ACK packets
+    void SendResponsePacket();
+
+    //parse response type
+    int AssembleResponse(packet_type_t* packet_type);
 
     //radio module
     RFM69 radio;

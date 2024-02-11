@@ -25,40 +25,53 @@ RadioHandler::~RadioHandler()
     //nothing to do for now
 }
 
+
+//assemble radio response from buffer
+int RadioHandler::AssembleResponse(packet_type_t* packet_type)
+{
+    //figure out what packet we got
+    packet_type_t rx_type;
+    memcpy(&rx_type, radio.DATA, sizeof(packet_type_t));
+
+    //copy gotten packet to the cache
+    switch(rx_type)
+    {
+        default: //do nothing if packet is not a predefined type
+            return -1; //improper packet
+            break;
+        case PACKET_CONTROL_VALUES:
+        {
+            memcpy(&last_gotten_control, radio.DATA, radio.DATALEN);
+            last_rssi = radio.RSSI;
+        }
+        break;
+        case PACKET_RESPONSE_VALUES:
+        {
+            Serial.printf("Got ACK\n");
+            memcpy(&last_gotten_response, radio.DATA, radio.DATALEN);
+            last_rssi = radio.RSSI;
+        }
+        break;
+    }
+
+    //pass type back to caller
+    if(packet_type)
+        *packet_type = rx_type;
+
+    //send data back if ACK was requested
+    if (radio.ACKRequested())
+        SendResponsePacket();
+
+    return 0; //success
+}
+
 //get and assemble a response from the radio
-int RadioHandler::CheckForResponse(packet_type_t* gotten_packet)
+int RadioHandler::CheckForResponse(packet_type_t* packet_type)
 {
     //packet waiting in queue
     if(radio.receiveDone())
     {
-        //figure out what packet we got
-        switch(radio.DATALEN)
-        {
-            default: //do nothing if packet is not a predefined type
-                return -1; //improper packet
-                break;
-            case sizeof(remote_control_packet_t):
-            {
-                memcpy(&last_gotten_control, radio.DATA, radio.DATALEN);
-                last_rssi = radio.RSSI;
-                if(gotten_packet)
-                    *gotten_packet = PACKET_CONTROL_VALUES;
-            }
-            break;
-            case sizeof(remote_response_packet_t):
-            {
-                memcpy(&last_gotten_response, radio.DATA, radio.DATALEN);
-                last_rssi = radio.RSSI;
-                if(gotten_packet)
-                    *gotten_packet = PACKET_RESPONSE_VALUES;
-            }
-            break;
-        }
-
-        if (radio.ACKRequested())
-            radio.sendACK();
-
-        return 0; //success
+        return AssembleResponse(packet_type);
     }
 
     return 1; //no packet to get
@@ -71,30 +84,37 @@ remote_control_packet_t RadioHandler::GetLastControlPacket()
 { return last_gotten_control;}
 
 
-//basic packet sending functions
-int RadioHandler::SendRCPacket(remote_control_packet_t packet, uint8_t destination, bool ack)
+//custom ACK handler
+void RadioHandler::SendResponsePacket()
+{
+    //filler data for now
+    remote_response_packet_t back_pack = {};
+    back_pack.hi_there = 16;
+
+    Serial.printf("Sent ACK\n");
+
+    radio.sendACK(&back_pack, sizeof(remote_response_packet_t));
+
+}
+
+
+
+//int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, bool ack)
+int RadioHandler::SendPacket(remote_control_packet_t packet, uint8_t destination, bool ack)
 {
     //enforce packettype
     packet.packettype = PACKET_CONTROL_VALUES;
-    int size = sizeof(packet);
-    return SendPacket(&packet, size, destination, ack);
-}
+    uint8_t size = sizeof(packet);
 
-int RadioHandler::SendResponsePacket(remote_response_packet_t packet, uint8_t destination, bool ack)
-{
-    //enforce packettype
-    packet.packettype = PACKET_RESPONSE_VALUES;
-    int size = sizeof(packet);
-    return SendPacket(&packet, size, destination, ack);
-}
-
-int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, bool ack)
-{
     if(ack)
     {
-        if(radio.sendWithRetry(destination, packet, size))
+        if(radio.sendWithRetry(destination, &packet, size))
         {
             //got ack
+            
+            //parse ACK response
+            AssembleResponse(NULL);
+
             return 0; //success
         }
         else
@@ -105,7 +125,7 @@ int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, boo
     }
     else
     {
-        radio.send(destination, packet, size);
+        radio.send(destination, &packet, size);
         return 0; //success
     }
 

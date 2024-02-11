@@ -19,7 +19,7 @@
 
 #define NETWORKID     0   // Must be the same for all nodes
 #define MYNODEID      2   // My node ID
-#define TONODEID      1   // Destination node ID
+#define TONODEID      255   // Destination node ID
 
 
 //#define FREQUENCY   RF69_433MHZ
@@ -39,7 +39,7 @@
 
 
 // Use ACKnowledge when sending messages (or not):
-#define USEACK        true // Request ACKs or not
+#define USEACK        false // Request ACKs or not
 
 //for processing and sending out remote control channel data
 #define CHANNEL_COUNT 12
