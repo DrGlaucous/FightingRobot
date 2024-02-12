@@ -1,9 +1,17 @@
 
 #include <Arduino.h>
+#include <PPMReader.h>
+
 
 #include "configuration.h"
 #include "TimerTick.h"
 #include "Radio.h"
+
+
+//Initialize a PPMReader on digital pin PA0 with 12 expected channels.
+uint32_t interruptPin = PA0;
+byte channelAmount = 12;
+PPMReader ppm(interruptPin, channelAmount, 1);
 
 
 
@@ -55,6 +63,11 @@ void setup() {
 
     Serial.begin(115200);
 
+    //setup PPM values for 12 channel mode
+    ppm.blankTime = 5000;//10000;
+    ppm.maxChannelValue = 1100;
+    ppm.minChannelValue = 400;
+
 }
 
 
@@ -64,21 +77,59 @@ void loop() {
 
     blink_lt(0);
 
-#ifdef IS_CONTROLLER
     static unsigned long last = 0;
+#ifdef IS_CONTROLLER
     if(gTimer.DeltaTimeMillis(&last, 5))
     {
+
+        //ready packet
         remote_control_packet_t packet_out = {};
         packet_out.channels[0] = 1280;
 
-        radio->SendPacket(packet_out, RECEIVERNODEID, USEACK);
+
+        //read PPM into packet struct
+        for (byte channel = 1; channel <= channelAmount; ++channel) {
+
+            //note: ppm.latestValidChannelValue is base-1!
+            packet_out.channels[channel - 1] = ppm.latestValidChannelValue(channel, 0);
+        }
+        //Serial.println(packet_out.channels[0]);
+
+        // Print latest valid values from all channels
+        // for (byte channel = 1; channel <= channelAmount; ++channel) {
+        //     unsigned value = ppm.latestValidChannelValue(channel, 0);
+        //     //unsigned value = ppm.rawChannelValue(channel);
+
+        //     Serial.print(value);
+        //     if(channel < channelAmount) Serial.print('\t');
+        // }
+        // Serial.println();
+
+
+        //transmit packet
+
+        //if transmit success print the bounceback time
+        if(!radio->SendPacket(packet_out, RECEIVERNODEID, USEACK))
+        {
+            Serial.printf("%d\n", radio->GetLastResponsePacket().hi_there);
+        }
+
     }
+#else
+
+
+
+    remote_ack_packet_t ackpt = {};
+    //last += 1;
+    ackpt.hi_there = radio->GetLastControlPacket().channels[0];
+    response_status_t responsee = radio->CheckForResponse(NULL, ackpt);
+    if(responsee == RX_SENT_ACK || responsee == RX_SUCCESS)
+    {
+        blink_lt(100);
+    }
+
 #endif
 
-    if(!radio->CheckForResponse())
-    {
-        blink_lt(10);
-    }
 
 
 

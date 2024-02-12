@@ -27,7 +27,7 @@ RadioHandler::~RadioHandler()
 
 
 //assemble radio response from buffer
-int RadioHandler::AssembleResponse(packet_type_t* packet_type)
+response_status_t RadioHandler::AssembleRX(packet_type_t* packet_type,  remote_ack_packet_t ack_packet)
 {
     //figure out what packet we got
     packet_type_t rx_type;
@@ -37,7 +37,7 @@ int RadioHandler::AssembleResponse(packet_type_t* packet_type)
     switch(rx_type)
     {
         default: //do nothing if packet is not a predefined type
-            return -1; //improper packet
+            return RX_BAD_FORMAT; //improper packet
             break;
         case PACKET_CONTROL_VALUES:
         {
@@ -47,7 +47,7 @@ int RadioHandler::AssembleResponse(packet_type_t* packet_type)
         break;
         case PACKET_RESPONSE_VALUES:
         {
-            Serial.printf("Got ACK\n");
+            //Serial.printf("Got ACK\n");
             memcpy(&last_gotten_response, radio.DATA, radio.DATALEN);
             last_rssi = radio.RSSI;
         }
@@ -60,43 +60,41 @@ int RadioHandler::AssembleResponse(packet_type_t* packet_type)
 
     //send data back if ACK was requested
     if (radio.ACKRequested())
-        SendResponsePacket();
+    {
+        SendResponsePacket(ack_packet);
+        return RX_SENT_ACK;
+    }
 
-    return 0; //success
+    return RX_SUCCESS; //success
 }
 
 //get and assemble a response from the radio
-int RadioHandler::CheckForResponse(packet_type_t* packet_type)
+response_status_t RadioHandler::CheckForResponse(packet_type_t* rx_packet_type, remote_ack_packet_t ack_packet)
 {
     //packet waiting in queue
     if(radio.receiveDone())
     {
-        return AssembleResponse(packet_type);
+        return AssembleRX(rx_packet_type, ack_packet);
     }
 
-    return 1; //no packet to get
+    return RX_NOTHING; //no packet to get
 }
 
 
-remote_response_packet_t RadioHandler::GetLastResponsePacket()
+remote_ack_packet_t RadioHandler::GetLastResponsePacket()
 { return last_gotten_response;}
 remote_control_packet_t RadioHandler::GetLastControlPacket()
 { return last_gotten_control;}
 
 
 //custom ACK handler
-void RadioHandler::SendResponsePacket()
+void RadioHandler::SendResponsePacket(remote_ack_packet_t ack_packet)
 {
-    //filler data for now
-    remote_response_packet_t back_pack = {};
-    back_pack.hi_there = 16;
+    //Serial.printf("Sent ACK\n");
 
-    Serial.printf("Sent ACK\n");
-
-    radio.sendACK(&back_pack, sizeof(remote_response_packet_t));
+    radio.sendACK(&ack_packet, sizeof(remote_ack_packet_t));
 
 }
-
 
 
 //int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, bool ack)
@@ -112,8 +110,8 @@ int RadioHandler::SendPacket(remote_control_packet_t packet, uint8_t destination
         {
             //got ack
             
-            //parse ACK response
-            AssembleResponse(NULL);
+            //parse ACK response, values are automatically stowed, so we don't need to give it anything
+            AssembleRX(NULL);
 
             return 0; //success
         }

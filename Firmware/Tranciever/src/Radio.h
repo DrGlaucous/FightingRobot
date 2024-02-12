@@ -12,6 +12,15 @@ typedef enum packet_type_e
     PACKET_RESPONSE_VALUES,
 }packet_type_t;
 
+
+typedef enum response_status_e
+{
+    RX_SUCCESS = 0,
+    RX_SENT_ACK,
+    RX_BAD_FORMAT,
+    RX_NOTHING,
+}response_status_t;
+
 //packet sent from the controller to the machine
 
 // To force compiler to use 1 byte packaging 
@@ -23,11 +32,12 @@ typedef struct remote_control_packet_s
 }remote_control_packet_t;
 
 //packet sent from the machine to the controller
-typedef struct remote_response_packet_s
+#pragma pack(1) 
+typedef struct remote_ack_packet_s
 {
     packet_type_t packettype = PACKET_RESPONSE_VALUES;
-    uint16_t hi_there = 0;
-}remote_response_packet_t;
+    uint64_t hi_there = 0;
+}remote_ack_packet_t;
 
 //all the settings for configuring the radio
 typedef struct radio_handler_config_datapack_s
@@ -51,9 +61,9 @@ class RadioHandler
 
     int SendPacket(remote_control_packet_t packet, uint8_t destination, bool ack);
 
-    int CheckForResponse(packet_type_t* gotten_packet = NULL);
+    response_status_t CheckForResponse(packet_type_t* rx_packet_type = NULL, remote_ack_packet_t ack_packet = {});
 
-    remote_response_packet_t GetLastResponsePacket();
+    remote_ack_packet_t GetLastResponsePacket();
     remote_control_packet_t GetLastControlPacket();
 
     private:
@@ -61,16 +71,16 @@ class RadioHandler
     //int SendPacket(void* packet, size_t size, uint8_t destination, bool ack);
 
     //only used to send ACK packets
-    void SendResponsePacket();
+    void SendResponsePacket(remote_ack_packet_t ack_packet);
 
     //parse response type
-    int AssembleResponse(packet_type_t* packet_type);
+    response_status_t AssembleRX(packet_type_t* packet_type, remote_ack_packet_t ack_packet = {});
 
     //radio module
     RFM69 radio;
 
     //these are where the fresh values are placed when a response is recieved
-    remote_response_packet_t last_gotten_response = {};
+    remote_ack_packet_t last_gotten_response = {};
     remote_control_packet_t last_gotten_control = {};
     int16_t last_rssi = 0; //RSSI rating of the last packet
 
