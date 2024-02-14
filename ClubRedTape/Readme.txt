@@ -1,0 +1,1 @@
+Things required by the club this robot is entered into in order to get it certified and usable.
