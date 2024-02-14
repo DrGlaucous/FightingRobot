@@ -6,12 +6,13 @@
 #include "configuration.h"
 #include "TimerTick.h"
 #include "Radio.h"
+#include "Controller.h"
 
 
 //Initialize a PPMReader on digital pin PA0 with 12 expected channels.
 //uint32_t interruptPin = PA0;
 //byte channelAmount = 12;
-PPMReader ppm(PPM_INTURRUPT_PIN, PPM_CHANNEL_COUNT, PPM_IS_INVERTED);
+//PPMReader ppm(PPM_INTURRUPT_PIN, PPM_CHANNEL_COUNT, PPM_IS_INVERTED);
 
 
 
@@ -36,7 +37,7 @@ void blink_lt(unsigned int time)
 
 
 RadioHandler* radio;
-
+ControllerHandler* controller;
 
 void setup() {
 
@@ -58,15 +59,17 @@ void setup() {
         ENCRYPTKEY,
     };
     radio = new RadioHandler(startup_settings);
+    
+    controller = new ControllerHandler();
 
     pinMode(LED_BUILTIN, OUTPUT);
 
     Serial.begin(115200);
 
-    //setup PPM values for 12 channel mode
-    ppm.blankTime = 5000;//10000;
-    ppm.maxChannelValue = 1100;
-    ppm.minChannelValue = 400;
+    // //setup PPM values for 12 channel mode
+    // ppm.blankTime = 5000;//10000;
+    // ppm.maxChannelValue = 1100;
+    // ppm.minChannelValue = 400;
 
 }
 
@@ -82,31 +85,33 @@ void loop() {
     if(gTimer.DeltaTimeMillis(&last, 5))
     {
 
-        //ready packet
-        remote_control_packet_t packet_out = {};
-        packet_out.channels[0] = 1280;
-
+        //moved all this to the dedicated class:
 
         //read PPM into packet struct
-        for (byte channel = 1; channel <= PPM_CHANNEL_COUNT; ++channel) {
-
-            //note: ppm.latestValidChannelValue is base-1!
-            packet_out.channels[channel - 1] = ppm.latestValidChannelValue(channel, 0);
-        }
+        // for (byte channel = 1; channel <= PPM_CHANNEL_COUNT; ++channel) {
+        //     //note: ppm.latestValidChannelValue is base-1!
+        //     packet_out.channels[channel - 1] = ppm.latestValidChannelValue(channel, 0);
+        // }
         //Serial.println(packet_out.channels[0]);
-
         // Print latest valid values from all channels
         // for (byte channel = 1; channel <= channelAmount; ++channel) {
         //     unsigned value = ppm.latestValidChannelValue(channel, 0);
         //     //unsigned value = ppm.rawChannelValue(channel);
-
         //     Serial.print(value);
         //     if(channel < channelAmount) Serial.print('\t');
         // }
         // Serial.println();
 
 
+        controller->update();
+
+
+
         //transmit packet
+
+        //ready packet
+        remote_control_packet_t packet_out = {};
+        packet_out.channels[0] = 1280;
 
         //if transmit success print the bounceback time
         if(!radio->SendPacket(packet_out, RECEIVERNODEID, USEACK))

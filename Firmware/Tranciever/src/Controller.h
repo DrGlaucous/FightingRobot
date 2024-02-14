@@ -20,8 +20,27 @@
 //+- this ammount when calculating digital sums
 #define NORMAL_NOISE_ERR 10
 
+
+
+
 //note: futaba's 12 channel protocol sends time-matched pairs of low then high signals.
 //We could catch either just one or both together per channel. It doesn't matter
+//with current settings, input values range from 970 to 550 (+- 2 or occasionally 3 for non-edge signals)
+//(right/bottom) is 970, (left/top) is 550
+//on back levers, up is 550, down is 970
+//on front knobs, CCW is MAX (1033), CW is MIN (487) (extra due to 30% detune, more on this later)
+//note: on non-lever elements, remove the self-detune (for correct normalization)
+
+//760 is center
+//when levers are UP, that mean's the're 'ON' (shorter PPM)
+
+
+//on servo menu, top left is (-100, -100) [550,550], just like PC diplay coords
+//bottom right is (100,100) [970,970]
+//some levers detune by +-30% (full range of 60%)
+//970 + detune = 1033, 970 - detune = 906
+
+
 
 
 

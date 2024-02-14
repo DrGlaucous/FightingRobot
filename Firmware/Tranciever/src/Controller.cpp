@@ -29,8 +29,10 @@ void ControllerHandler::update()
 {
     //get PPM from remote
     GetControlSurface(raw_channels[this_index], PPM_CHANNEL_COUNT);
+    
+    
     //process the outliers
-    ProcessOutliers();
+    //ProcessOutliers();
 
     //roll over the index tickers
     last_index = this_index;
@@ -79,7 +81,10 @@ void ControllerHandler::GetControlSurface(uint16_t* channel_array, uint16_t arra
 
         //note: ppm.latestValidChannelValue is base-1!
         channel_array[channel - 1] = ppm->latestValidChannelValue(channel, channel_array[channel - 1]);
+        Serial.printf("%d, \t", channel_array[channel - 1]);
     }
+    Serial.println();
+
 
 }
 
