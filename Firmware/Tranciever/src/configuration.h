@@ -10,9 +10,6 @@
 #define RECEIVERNODEID      1   //node the transmitter lives on
 #define TRANSMITTERNODEID   2   //node the robot lives on
 
-//#define MYNODEID      1   // My node ID
-//#define TONODEID      2   // Destination node ID
-
 
 //#define FREQUENCY   RF69_433MHZ
 #define FREQUENCY     RF69_915MHZ
@@ -23,7 +20,7 @@
 #define IRQ_PIN PB4
 
 #define ENCRYPT       true // Set to "true" to use encryption
-#define ENCRYPTKEY    "TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
+#define ENCRYPTKEY    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
 
 // Use ACKnowledge when sending messages (or not):
 #define USEACK        true // Request ACKs or not

@@ -13,8 +13,12 @@
 //how far off an outlier should be before it is "corrected"
 #define OUTLIER_THRESH 40
 
-//the range of the normalized analog values (mapped between [0,this), exclusive)
+//the range of the normalized analog values (mapped between [0,this), exclusive? or inclusive?)
+#define NORMAL_MIN 0
 #define NORMAL_MAX 512
+
+//+- this ammount when calculating digital sums
+#define NORMAL_NOISE_ERR 10
 
 //note: futaba's 12 channel protocol sends time-matched pairs of low then high signals.
 //We could catch either just one or both together per channel. It doesn't matter
@@ -22,7 +26,7 @@
 
 
 
-//all the variables needed to initialize the PPM library
+//all the variables needed to initialize the PPM library (for actually getting data from the control surface)
 typedef struct ppm_config_s
 {
     //times in microseconds
@@ -32,6 +36,12 @@ typedef struct ppm_config_s
     unsigned int min_channel_value = 400; //the shortest a ppm signal will be
 
 } ppm_config_t;
+
+
+
+
+
+//all of these structs take the smooth value that was computed using the groupings in the main class
 
 //for things like sliders and control sticks
 typedef struct channel_analog_s
@@ -50,11 +60,17 @@ typedef struct channel_digital_s
     byte switch_main;
     byte switch_second;
 
-    //the changes in PPM delay expected to be inflicted by each switch
+    //the changes in normalized delay expected to be inflicted by each switch
     unsigned int value_shift_main;
     unsigned int value_shift_second;
 
+    //holds limits and value for normalizing the switch to begin with
+    channel_analog_t normalized_in;
+
 } channel_digital_t;
+
+
+
 
 class ControllerHandler
 {
@@ -68,7 +84,7 @@ class ControllerHandler
 
 
     //using the initial config, normalizes an array of PPM values
-    void NormalizePPM(uint16_t* channels, uint16_t len);
+    void NormalizePPM(uint16_t raw_data, channel_analog_t* normalized_data);
 
     //copies the PPM from the class to the variable passed to the function
     void GetRawPPM(uint16_t* channels, uint16_t len);
@@ -76,12 +92,29 @@ class ControllerHandler
 
     private:
 
+    //pointer to PPM
+    PPMReader* ppm;
+
     //cache the last X reads for outlier averaging
     uint16_t raw_channels[AVERAGE_POOL_CNT][CHANNEL_COUNT] = {};
-    uint8_t recent_index;
+    
+    //goes through the list of AVERAGE_POOL_CNT so we don't need to shift values around
+    uint8_t this_index = {};
+    uint8_t last_index = {}; //it's OK if these are initalized to the same value
 
     //array holding the smoothed ppm values from the controller
     uint16_t processed_channels[CHANNEL_COUNT] = {};
+
+    //private functions
+
+    //smooth the arrays above
+    void ProcessOutliers();
+
+    //put raw PPM into channel_array
+    void GetControlSurface(uint16_t* channel_array, uint16_t array_len);
+
+    //turn raw delay value into descrete switch positions
+    void ParseSwitchSums(uint16_t raw_data, channel_digital_t *profile);
 
 
 };

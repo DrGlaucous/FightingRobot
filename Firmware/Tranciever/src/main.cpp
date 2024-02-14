@@ -9,9 +9,9 @@
 
 
 //Initialize a PPMReader on digital pin PA0 with 12 expected channels.
-uint32_t interruptPin = PA0;
-byte channelAmount = 12;
-PPMReader ppm(interruptPin, channelAmount, 1);
+//uint32_t interruptPin = PA0;
+//byte channelAmount = 12;
+PPMReader ppm(PPM_INTURRUPT_PIN, PPM_CHANNEL_COUNT, PPM_IS_INVERTED);
 
 
 
@@ -88,7 +88,7 @@ void loop() {
 
 
         //read PPM into packet struct
-        for (byte channel = 1; channel <= channelAmount; ++channel) {
+        for (byte channel = 1; channel <= PPM_CHANNEL_COUNT; ++channel) {
 
             //note: ppm.latestValidChannelValue is base-1!
             packet_out.channels[channel - 1] = ppm.latestValidChannelValue(channel, 0);
