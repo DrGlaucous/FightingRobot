@@ -60,6 +60,7 @@ void setup() {
     };
     radio = new RadioHandler(startup_settings);
     
+    
     controller = new ControllerHandler();
 
     pinMode(LED_BUILTIN, OUTPUT);
@@ -101,7 +102,7 @@ void loop() {
         //     if(channel < channelAmount) Serial.print('\t');
         // }
         // Serial.println();
-
+        blink_lt(10);
 
         controller->update();
 

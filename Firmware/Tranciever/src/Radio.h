@@ -29,6 +29,11 @@ typedef struct remote_control_packet_s
 {
     packet_type_t packettype = PACKET_CONTROL_VALUES;
     uint16_t channels[CHANNEL_COUNT] = {};
+
+    uint16_t analog_channels[ANALOG_CHANNEL_CNT] = {};
+    //2 switches per each digital channel
+    uint8_t digital_channels[DIGITAL_CHANNEL_CNT * 2] = {};
+
 }remote_control_packet_t;
 
 //packet sent from the machine to the controller

@@ -35,3 +35,64 @@ on top and bottom walls, other robots use 1.5-2mm thick shells
 
 for edge walls, 3-5mm will suffice (put curves so the robot cannot sit on them)
 
+
+
+
+
+
+
+
+Futaba 12 channel troubles:
+
+reset line is
+
+long time LOW->long time HIGH
+
+
+each channel has a LOW time that matches a HIGH time
+
+
+A channel may unexpectedly cut out before transmission is complete, completing a "cycle" prematurely.
+it will wait at least one complete cycle before finishing the half-done channel.
+
+in order to ensure that we get good signals every time, we need to detect the bad channel pauses.
+The easiest way to (possibly) do this is to only update all the channel values if we get all of them in one go.
+
+
+if we detect a reset rollover, we then move the waiting signals over to the visible surface ONLY if we got all of them. Partials will not count.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

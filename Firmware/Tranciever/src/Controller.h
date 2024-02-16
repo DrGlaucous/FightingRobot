@@ -1,25 +1,11 @@
 //gathers raw input from the control surface in the form of PPM
 //also takes the PPM values and normalizes them
-
 #pragma once
 
 #include <Arduino.h>
 #include <PPMReader.h>
 
 #include "configuration.h"
-
-//how many reads to cache for outlier removal (bigger means slower and smoother signals)
-#define AVERAGE_POOL_CNT 3
-//how far off an outlier should be before it is "corrected"
-#define OUTLIER_THRESH 40
-
-//the range of the normalized analog values (mapped between [0,this), exclusive? or inclusive?)
-#define NORMAL_MIN 0
-#define NORMAL_MAX 512
-
-//+- this ammount when calculating digital sums
-#define NORMAL_NOISE_ERR 10
-
 
 
 
@@ -40,27 +26,33 @@
 //some levers detune by +-30% (full range of 60%)
 //970 + detune = 1033, 970 - detune = 906
 
-
-
+//complete range is 420ms, centerpoint is 210
+//30% detune is 64ms, x2 is 128 (calculated: 126)
 
 
 
 //all the variables needed to initialize the PPM library (for actually getting data from the control surface)
-typedef struct ppm_config_s
-{
-    //times in microseconds
-    bool is_falling = true; //trigger on the falling edge
-    unsigned int blank_time = 5000; //minimum time between ppm signals
-    unsigned int max_channel_value = 1100; //the longest a ppm signal will be
-    unsigned int min_channel_value = 400; //the shortest a ppm signal will be
-
-} ppm_config_t;
+//not used ATM
+// typedef struct ppm_config_s
+// {
+//     //ppm config stuff
+//     //times in microseconds
+//     unsigned int blank_time = PPM_BLANK_TIME; //minimum time between ppm signals
+//     unsigned int max_channel_value = PPM_MAX_WAIT_VALUE; //the longest a ppm signal will be
+//     unsigned int min_channel_value = PPM_MIN_WAIT_VALUE; //the shortest a ppm signal will be
+//     unsigned int inturrupt_pin = PPM_INTURRUPT_PIN; //pin to get delays from
+//     bool inverted_ppm = PPM_IS_INVERTED; //trigger on the falling edge
+//     //general control surface stuff
+//     unsigned int channel_count = PPM_CHANNEL_COUNT; //number of channels
+// } ppm_config_t;
 
 
 
 
 
 //all of these structs take the smooth value that was computed using the groupings in the main class
+
+
 
 //for things like sliders and control sticks
 typedef struct channel_analog_s
@@ -124,9 +116,15 @@ class ControllerHandler
     //array holding the smoothed ppm values from the controller
     uint16_t processed_channels[CHANNEL_COUNT] = {};
 
+
+    //holds all the data we get from the PPM, analog channels are indexed first when collecting data
+    channel_analog_t analog_channels[ANALOG_CHANNEL_CNT] = {};
+    channel_digital_t digital_channels[DIGITAL_CHANNEL_CNT] = {};
+
+
     //private functions
 
-    //smooth the arrays above
+    //smooth the arrays above =note= we fixed the problems with the PPM reader, this is depricated now
     void ProcessOutliers();
 
     //put raw PPM into channel_array
@@ -135,13 +133,11 @@ class ControllerHandler
     //turn raw delay value into descrete switch positions
     void ParseSwitchSums(uint16_t raw_data, channel_digital_t *profile);
 
+    //test
+    void PrintRawChannels(uint16_t* channel_array, uint16_t array_len);
+
+
+
 
 };
-
-
-
-
-
-
-
 

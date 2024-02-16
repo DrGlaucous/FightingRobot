@@ -51,7 +51,12 @@ class PPMReader {
     byte channelAmount = 0;
 
     // Arrays for keeping track of channel values
+
+    //holds stuff gathered from the ISR (not guaranteed to be complete)
+    volatile unsigned *partialValues = NULL;
+    //holds only the latest complete packet of values
     volatile unsigned *rawValues = NULL;
+
 
     // A counter variable for determining which channel is being read next
     volatile byte pulseCounter = 0;

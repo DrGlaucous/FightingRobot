@@ -37,16 +37,20 @@ PPMReader::PPMReader(byte interruptPin, byte channelAmount, byte isFalling):
     memset((void*)rawValues, 0, sizeof(unsigned) * channelAmount);
     
     
+    partialValues = new unsigned [channelAmount];
+    memset((void*)partialValues, 0, sizeof(unsigned) * channelAmount);
+
+
     // Attach an interrupt to the pin
     pinMode(interruptPin, INPUT);
     if(ppm == NULL) {
         ppm = this;
 
 
-        if(isFalling) //weird Futaba 12 channel protocol
-            attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, FALLING);
-        else
-            attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, RISING);
+    if(isFalling) //weird Futaba 12 channel protocol
+        attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, FALLING);
+    else
+        attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, RISING);
     }
 
 
@@ -59,6 +63,7 @@ PPMReader::~PPMReader(void) {
     detachInterrupt(digitalPinToInterrupt(interruptPin));
     if(ppm == this) ppm = NULL;
     delete [] rawValues;
+    delete [] partialValues;
 }
 
 void PPMReader::handleInterrupt(void) {
@@ -69,13 +74,22 @@ void PPMReader::handleInterrupt(void) {
 
 
     if (time > blankTime) {
+
+        //check for packet completeness
+        if(pulseCounter >= channelAmount)
+        {
+            //unsafe to use memcpy on volatiles; do it manually
+            for(int i = 0; i < channelAmount; ++i)
+                rawValues[i] = partialValues[i];
+        }
+
         // Blank detected: restart from channel 1 
         pulseCounter = 0;
     }
     else {
         // Store times between pulses as channel values
         if (pulseCounter < channelAmount) {
-            rawValues[pulseCounter] = time;
+            partialValues[pulseCounter] = time;
             ++pulseCounter;
         }
     }

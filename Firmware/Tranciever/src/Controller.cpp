@@ -10,7 +10,7 @@
 
 ControllerHandler::ControllerHandler()
 {
-    ppm = new PPMReader(PPM_INTURRUPT_PIN, PPM_CHANNEL_COUNT, PPM_IS_INVERTED);
+    ppm = new PPMReader(PPM_INTURRUPT_PIN, CHANNEL_COUNT, PPM_IS_INVERTED);
 
     //setup PPM values for 12 channel mode
     ppm->blankTime = PPM_BLANK_TIME;//10000;
@@ -30,9 +30,27 @@ void ControllerHandler::update()
     //get PPM from remote
     GetControlSurface(raw_channels[this_index], PPM_CHANNEL_COUNT);
     
+    //[test] print the rolling index
+    //Serial.printf("%d, %d \n",this_index, last_index);
     
     //process the outliers
-    //ProcessOutliers();
+    ProcessOutliers();
+
+    //test
+    PrintRawChannels(raw_channels[this_index], PPM_CHANNEL_COUNT);
+    //PrintRawChannels(processed_channels, PPM_CHANNEL_COUNT);
+
+    //normalize data for analog channels
+    for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
+    {
+        NormalizePPM(processed_channels[i], &analog_channels[i]);
+    }
+    //process digital channels
+    for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
+    {
+        //normalization happens inside this function
+        //ParseSwitchSums(processed_channels[ANALOG_CHANNEL_CNT + i], &digital_channels[i]);
+    }
 
     //roll over the index tickers
     last_index = this_index;
@@ -49,7 +67,7 @@ void ControllerHandler::ProcessOutliers()
     uint16_t* this_pool = raw_channels[this_index];
 
     //get pointer to last index
-    uint16_t* last_pool = raw_channels[last_index];
+    //uint16_t* last_pool = raw_channels[last_index];
 
 
     //in all channels, see if the most recent value is an outlier of all the others (average)
@@ -57,12 +75,19 @@ void ControllerHandler::ProcessOutliers()
     {
         uint32_t average_val = 0;
         for(int j = 0; j < AVERAGE_POOL_CNT; ++j)
-            average_val += raw_channels[j][i];
-        average_val /= AVERAGE_POOL_CNT;
+        {
+            //ignore the looked-at value
+            if(j != this_index)
+                average_val += raw_channels[j][i];
+        }
+        average_val /= (AVERAGE_POOL_CNT - 1);
 
         //is outlier, push out average
         if(abs(((int)this_pool[i] - (int)average_val)) > OUTLIER_THRESH)
+        {
+            //Serial.printf("Outlier Trimmed, Average: %d || Outlier: %d || \n", this_pool[i], average_val, i);
             processed_channels[i] = (uint16_t)average_val;
+        }
         else //push out vanilla
             processed_channels[i] = this_pool[i];
     }
@@ -81,9 +106,12 @@ void ControllerHandler::GetControlSurface(uint16_t* channel_array, uint16_t arra
 
         //note: ppm.latestValidChannelValue is base-1!
         channel_array[channel - 1] = ppm->latestValidChannelValue(channel, channel_array[channel - 1]);
-        Serial.printf("%d, \t", channel_array[channel - 1]);
+        
+        //test: report back serial values
+        //Serial.printf("%d, \t", channel_array[channel - 1]);
     }
-    Serial.println();
+    //test
+    //Serial.println();
 
 
 }
@@ -109,7 +137,7 @@ void ControllerHandler::ParseSwitchSums(uint16_t raw_data, channel_digital_t *pr
     NormalizePPM(raw_data, &profile->normalized_in);
 
     //for ease of typing
-    auto normal_num = profile->normalized_in.value_normalized;
+    //auto normal_num = profile->normalized_in.value_normalized;
 
     //'0' state should be 256
     //NORMAL_MAX / 2
@@ -133,18 +161,17 @@ void ControllerHandler::ParseSwitchSums(uint16_t raw_data, channel_digital_t *pr
 }
 
 
-
-
-
-
-
-
-
-
-
-
-
-
+//test: read back PPM vals
+void ControllerHandler::PrintRawChannels(uint16_t* channel_array, uint16_t array_len)
+{
+    for (byte channel = 1; channel <= array_len; ++channel)
+    {
+        //test: report back serial values
+        Serial.printf("%d, \t", channel_array[channel - 1]);
+    }
+    //test
+    Serial.println();
+}
 
 
 
