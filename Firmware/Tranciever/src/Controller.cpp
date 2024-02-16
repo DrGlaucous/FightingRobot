@@ -28,22 +28,22 @@ ControllerHandler::~ControllerHandler()
 void ControllerHandler::update()
 {
     //get PPM from remote
-    GetControlSurface(raw_channels[this_index], PPM_CHANNEL_COUNT);
+    GetControlSurface(p_channels, PPM_CHANNEL_COUNT);
     
     //[test] print the rolling index
     //Serial.printf("%d, %d \n",this_index, last_index);
     
     //process the outliers
-    ProcessOutliers();
+    //ProcessOutliers();
 
     //test
-    PrintRawChannels(raw_channels[this_index], PPM_CHANNEL_COUNT);
+    PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
     //PrintRawChannels(processed_channels, PPM_CHANNEL_COUNT);
 
     //normalize data for analog channels
     for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
     {
-        NormalizePPM(processed_channels[i], &analog_channels[i]);
+        NormalizePPM(p_channels[i], &analog_channels[i]);
     }
     //process digital channels
     for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
@@ -53,14 +53,15 @@ void ControllerHandler::update()
     }
 
     //roll over the index tickers
-    last_index = this_index;
-    if(++this_index >= AVERAGE_POOL_CNT)
-        this_index = 0;
+    //last_index = this_index;
+    //if(++this_index >= AVERAGE_POOL_CNT)
+    //    this_index = 0;
 
 }
 
 
 //handle recieved outliers
+/*
 void ControllerHandler::ProcessOutliers()
 {
     //get pointer to the most recent entry in the pool
@@ -96,6 +97,7 @@ void ControllerHandler::ProcessOutliers()
 
 
 }
+*/
 
 //read PPM values from the controller and run processOutliers
 void ControllerHandler::GetControlSurface(uint16_t* channel_array, uint16_t array_len)
@@ -160,7 +162,6 @@ void ControllerHandler::ParseSwitchSums(uint16_t raw_data, channel_digital_t *pr
 
 }
 
-
 //test: read back PPM vals
 void ControllerHandler::PrintRawChannels(uint16_t* channel_array, uint16_t array_len)
 {
@@ -172,6 +173,13 @@ void ControllerHandler::PrintRawChannels(uint16_t* channel_array, uint16_t array
     //test
     Serial.println();
 }
+
+
+
+
+
+
+
 
 
 

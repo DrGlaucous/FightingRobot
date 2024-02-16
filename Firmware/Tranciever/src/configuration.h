@@ -57,10 +57,11 @@
     #define ANALOG_MIN_LIM 550
     #define ANALOG_MAX_LIM 970
 
+    //outlier removal is depricated in lieu of the updated PPM reading library
     //how many reads to cache for outlier removal (bigger means slower and smoother signals)
-    #define AVERAGE_POOL_CNT 3
+    //#define AVERAGE_POOL_CNT 3
     //how far off an outlier should be before it is "corrected"
-    #define OUTLIER_THRESH 40
+    //#define OUTLIER_THRESH 40
 
     //+- this ammount when calculating digital sums
     #define NORMAL_NOISE_ERR 10

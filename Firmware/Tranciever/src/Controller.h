@@ -107,14 +107,13 @@ class ControllerHandler
     PPMReader* ppm;
 
     //cache the last X reads for outlier averaging
-    uint16_t raw_channels[AVERAGE_POOL_CNT][CHANNEL_COUNT] = {};
-    
+    //uint16_t raw_channels[AVERAGE_POOL_CNT][CHANNEL_COUNT] = {};
     //goes through the list of AVERAGE_POOL_CNT so we don't need to shift values around
-    uint8_t this_index = {};
-    uint8_t last_index = {}; //it's OK if these are initalized to the same value
+    //uint8_t this_index = {};
+    //uint8_t last_index = {}; //it's OK if these are initalized to the same value
 
     //array holding the smoothed ppm values from the controller
-    uint16_t processed_channels[CHANNEL_COUNT] = {};
+    uint16_t p_channels[CHANNEL_COUNT] = {};
 
 
     //holds all the data we get from the PPM, analog channels are indexed first when collecting data
@@ -125,7 +124,7 @@ class ControllerHandler
     //private functions
 
     //smooth the arrays above =note= we fixed the problems with the PPM reader, this is depricated now
-    void ProcessOutliers();
+    //void ProcessOutliers();
 
     //put raw PPM into channel_array
     void GetControlSurface(uint16_t* channel_array, uint16_t array_len);
