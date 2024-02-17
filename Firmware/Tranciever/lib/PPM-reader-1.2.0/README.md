@@ -1,10 +1,16 @@
 # PPM Reader for Arduino
 
-
 *also works on STM32*
+
+
+
 ## Changes:
+
 Add option to invert the trigger signal specifically for mapping to futaba 12 channel PPM. (other controllers may also use this same signal type)
 
+
+---
+## Overview
 
 PPM Reader is an interrupt based [pulse-position modulation](https://en.wikipedia.org/wiki/Pulse-position_modulation) (PPM) signal reading library for Arduino. Its purpose is to provide an easy to use, non-blocking solution for decoding the signal from an RC receiver that is able to encode data from multiple channels as PPM.
 

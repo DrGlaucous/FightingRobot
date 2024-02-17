@@ -29,7 +29,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-#define IS_CONTROLLER
+//#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////
@@ -49,7 +49,7 @@
 
 
 //PPM config stuff is only really needed for the transmitter
-#ifdef IS_CONTROLLER
+//#ifdef IS_CONTROLLER
 
     //////NORMALIZATION CONSTANTS
 
@@ -83,8 +83,8 @@
     //#define PPM_MIN_WAIT_VALUE 1000
     //#define PPM_IS_INVERTED false
 
-#else
+//#else
     //something
     #define KAKAJAMANGA
-#endif
+//#endif
 
