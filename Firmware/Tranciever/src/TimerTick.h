@@ -1,7 +1,9 @@
+//global timer class: makes getting delta time easier
 #pragma once
 #include <Arduino.h>
 
 #include "configuration.h"
+
 
 class TimerHandler
 {

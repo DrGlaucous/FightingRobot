@@ -23,11 +23,18 @@
 
 //on servo menu, top left is (-100, -100) [550,550], just like PC diplay coords
 //bottom right is (100,100) [970,970]
-//some levers detune by +-30% (full range of 60%)
+//some levers detune by +-15% (full range of 30%)
 //970 + detune = 1033, 970 - detune = 906
 
 //complete range is 420ms, centerpoint is 210
 //30% detune is 64ms, x2 is 128 (calculated: 126)
+
+
+//normalization rules:
+
+//analog channels will vary between 0 and 1024, period. It will not exceed these numbers
+//digital values will vary from 0-2, depending on the switch position
+
 
 
 
@@ -48,11 +55,7 @@
 
 
 
-
-
-//all of these structs take the smooth value that was computed using the groupings in the main class
-
-
+//all of these structs take the raw PPM value
 
 //for things like sliders and control sticks
 typedef struct channel_analog_s
@@ -60,8 +63,9 @@ typedef struct channel_analog_s
     uint16_t value_normalized;
 
     //values to normalize input between (values outside will be truncated)
-    unsigned int min_raw_val;
-    unsigned int max_raw_val;
+    //currently defined constants
+    //unsigned int min_raw_val;
+    //unsigned int max_raw_val;
 
 } channel_analog_t;
 //for things like buttons and switches (usually 2 switches share a single channel)
@@ -71,18 +75,26 @@ typedef struct channel_digital_s
     byte switch_main;
     byte switch_second;
 
-    //the changes in normalized delay expected to be inflicted by each switch
-    unsigned int value_shift_main;
-    unsigned int value_shift_second;
+    //the changes in raw delay expected to be inflicted by each switch
+    //currently defined constants
+    //unsigned int value_shift_main;
+    //unsigned int value_shift_second;
 
     //holds limits and value for normalizing the switch to begin with
-    channel_analog_t normalized_in;
+    //channel_analog_t normalized_in;
 
 } channel_digital_t;
 
+//used to transmit a packet over the radio to the reciever
+#pragma pack(1)
+typedef struct concatated_channels_s
+{
+    uint16_t analog_channels[ANALOG_CHANNEL_CNT] = {};
+    //2 switches per each digital channel
+    uint8_t digital_channels[DIGITAL_CHANNEL_CNT * 2] = {};
+}concatated_channels_t;
 
-
-
+#ifdef IS_CONTROLLER
 class ControllerHandler
 {
 
@@ -100,17 +112,14 @@ class ControllerHandler
     //copies the PPM from the class to the variable passed to the function
     void GetRawPPM(uint16_t* channels, uint16_t len);
 
+    //combines all channel values into a struct for transmission
+    concatated_channels_t GetReadyPacket();
+
 
     private:
 
     //pointer to PPM
     PPMReader* ppm;
-
-    //cache the last X reads for outlier averaging
-    //uint16_t raw_channels[AVERAGE_POOL_CNT][CHANNEL_COUNT] = {};
-    //goes through the list of AVERAGE_POOL_CNT so we don't need to shift values around
-    //uint8_t this_index = {};
-    //uint8_t last_index = {}; //it's OK if these are initalized to the same value
 
     //array holding the smoothed ppm values from the controller
     uint16_t p_channels[CHANNEL_COUNT] = {};
@@ -123,8 +132,6 @@ class ControllerHandler
 
     //private functions
 
-    //smooth the arrays above =note= we fixed the problems with the PPM reader, this is depricated now
-    //void ProcessOutliers();
 
     //put raw PPM into channel_array
     void GetControlSurface(uint16_t* channel_array, uint16_t array_len);
@@ -134,9 +141,12 @@ class ControllerHandler
 
     //test
     void PrintRawChannels(uint16_t* channel_array, uint16_t array_len);
+    void PrintProcessedChannels();
 
 
 
 
 };
 
+
+#endif

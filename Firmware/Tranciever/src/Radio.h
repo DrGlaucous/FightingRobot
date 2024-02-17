@@ -1,9 +1,14 @@
+//handles transmission and reception of controller packets through the RFM69HW radio module
 #pragma once
 
 #include <Arduino.h>
 #include <RFM69.h>
 
 #include "configuration.h"
+
+#include "Controller.h"
+
+
 
 typedef enum packet_type_e
 {
@@ -28,13 +33,13 @@ typedef enum response_status_e
 typedef struct remote_control_packet_s
 {
     packet_type_t packettype = PACKET_CONTROL_VALUES;
-    uint16_t channels[CHANNEL_COUNT] = {};
 
-    uint16_t analog_channels[ANALOG_CHANNEL_CNT] = {};
-    //2 switches per each digital channel
-    uint8_t digital_channels[DIGITAL_CHANNEL_CNT * 2] = {};
+    //uint16_t channels[CHANNEL_COUNT] = {};
+    concatated_channels_t channels = {};
 
 }remote_control_packet_t;
+
+
 
 //packet sent from the machine to the controller
 #pragma pack(1) 
@@ -64,21 +69,27 @@ class RadioHandler
     RadioHandler(radio_handler_config_datapack_t settings);
     ~RadioHandler();
 
+    //sends a predefined radio packet to the reciever
     int SendPacket(remote_control_packet_t packet, uint8_t destination, bool ack);
 
+    //checks to see if something was sent to the radio, returns how the check went,
+    //optional pointer to the gotten packet type
+    //optional pointer to a packet to send back (ONLY if the transmission requested an ACK)
     response_status_t CheckForResponse(packet_type_t* rx_packet_type = NULL, remote_ack_packet_t ack_packet = {});
 
+    //return the data we got when we checked for a response
     remote_ack_packet_t GetLastResponsePacket();
     remote_control_packet_t GetLastControlPacket();
 
+    uint64_t GetTimeSinceLastPacket();
+
     private:
 
-    //int SendPacket(void* packet, size_t size, uint8_t destination, bool ack);
 
     //only used to send ACK packets
     void SendResponsePacket(remote_ack_packet_t ack_packet);
 
-    //parse response type
+    //parse response type and stores the response in the class to be returned with the functions above
     response_status_t AssembleRX(packet_type_t* packet_type, remote_ack_packet_t ack_packet = {});
 
     //radio module
@@ -89,11 +100,11 @@ class RadioHandler
     remote_control_packet_t last_gotten_control = {};
     int16_t last_rssi = 0; //RSSI rating of the last packet
 
+    //the time when the last packet was recieved (used for keepalive)
+    uint64_t last_rx_millis = 0;
+
+
 };
-
-
-
-
 
 
 

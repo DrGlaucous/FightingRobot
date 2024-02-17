@@ -7,6 +7,7 @@
 #include "configuration.h"
 #include "TimerTick.h"
 
+#ifdef IS_CONTROLLER
 
 ControllerHandler::ControllerHandler()
 {
@@ -32,13 +33,10 @@ void ControllerHandler::update()
     
     //[test] print the rolling index
     //Serial.printf("%d, %d \n",this_index, last_index);
-    
-    //process the outliers
-    //ProcessOutliers();
+
 
     //test
-    PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
-    //PrintRawChannels(processed_channels, PPM_CHANNEL_COUNT);
+    //PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
 
     //normalize data for analog channels
     for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
@@ -48,56 +46,28 @@ void ControllerHandler::update()
     //process digital channels
     for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
     {
-        //normalization happens inside this function
-        //ParseSwitchSums(processed_channels[ANALOG_CHANNEL_CNT + i], &digital_channels[i]);
+        ParseSwitchSums(p_channels[ANALOG_CHANNEL_CNT + i], &digital_channels[i]);
     }
 
-    //roll over the index tickers
-    //last_index = this_index;
-    //if(++this_index >= AVERAGE_POOL_CNT)
-    //    this_index = 0;
+    //PrintProcessedChannels();
+
 
 }
 
-
-//handle recieved outliers
-/*
-void ControllerHandler::ProcessOutliers()
+//return a combined list of all radio data
+concatated_channels_t ControllerHandler::GetReadyPacket()
 {
-    //get pointer to the most recent entry in the pool
-    uint16_t* this_pool = raw_channels[this_index];
+    concatated_channels_t output = {};
+    for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
+        output.analog_channels[i] = analog_channels[i].value_normalized;
 
-    //get pointer to last index
-    //uint16_t* last_pool = raw_channels[last_index];
-
-
-    //in all channels, see if the most recent value is an outlier of all the others (average)
-    for(int i = 0; i < CHANNEL_COUNT; ++i)
+    for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
     {
-        uint32_t average_val = 0;
-        for(int j = 0; j < AVERAGE_POOL_CNT; ++j)
-        {
-            //ignore the looked-at value
-            if(j != this_index)
-                average_val += raw_channels[j][i];
-        }
-        average_val /= (AVERAGE_POOL_CNT - 1);
-
-        //is outlier, push out average
-        if(abs(((int)this_pool[i] - (int)average_val)) > OUTLIER_THRESH)
-        {
-            //Serial.printf("Outlier Trimmed, Average: %d || Outlier: %d || \n", this_pool[i], average_val, i);
-            processed_channels[i] = (uint16_t)average_val;
-        }
-        else //push out vanilla
-            processed_channels[i] = this_pool[i];
+        output.digital_channels[i * 2] = digital_channels[i].switch_main;
+        output.digital_channels[i * 2 + 1] = digital_channels[i].switch_second;
     }
-
-
-
-
+    return output;
 }
-*/
 
 //read PPM values from the controller and run processOutliers
 void ControllerHandler::GetControlSurface(uint16_t* channel_array, uint16_t array_len)
@@ -118,29 +88,25 @@ void ControllerHandler::GetControlSurface(uint16_t* channel_array, uint16_t arra
 
 }
 
-//take a channel array and normalize them according to their structs
+//take a channel and normalize it according to the channel channel's config
 void ControllerHandler::NormalizePPM(uint16_t raw_data, channel_analog_t* normalized_data)
 {
 
     //truncate OOB
-    if(raw_data > normalized_data->max_raw_val)
-        raw_data = normalized_data->max_raw_val;
-    else if(raw_data < normalized_data->min_raw_val)
-        raw_data = normalized_data->min_raw_val;
+    if(raw_data < ANALOG_MIN_LIM)
+        raw_data = ANALOG_MIN_LIM;
+    else if(raw_data > ANALOG_MAX_LIM)
+        raw_data = ANALOG_MAX_LIM;
 
     //normalize
-    normalized_data->value_normalized = map(raw_data, normalized_data->min_raw_val, normalized_data->max_raw_val, NORMAL_MIN, NORMAL_MAX);
+    normalized_data->value_normalized = map(raw_data, ANALOG_MIN_LIM, ANALOG_MAX_LIM, NORMAL_MIN, NORMAL_MAX);
 
 }
-
+//take a channel and determine the two switch positions based on channel's config
 void ControllerHandler::ParseSwitchSums(uint16_t raw_data, channel_digital_t *profile)
 {
-    //normalize the analog portion of the signal
-    NormalizePPM(raw_data, &profile->normalized_in);
 
-    //for ease of typing
-    //auto normal_num = profile->normalized_in.value_normalized;
-
+    /*
     //'0' state should be 256
     //NORMAL_MAX / 2
 
@@ -148,15 +114,80 @@ void ControllerHandler::ParseSwitchSums(uint16_t raw_data, channel_digital_t *pr
     
     //9 states:
 
-    //big switch
-    //0
-    //1
-    //2
+    //big switch: +-210
+    //0 - 550
+    //1 - 760
+    //2 - 970
 
-    //small switch
-    //0
-    //1
-    //2
+    //small switch: +-64
+    //0 - -64
+    //1 - 0
+    //2 - 64
+
+
+    //big state 0
+    // MIN - DETUNE - NOISE < X < MIN - DETUNE + NOISE
+    // X < MIN + (DETUNE + NOISE)
+    // MIDPOINT = MIN
+
+    //big state 1
+    // (MAX-MIN)/2 - DETUNE - NOISE < X < (MAX-MIN)/2 + DETUNE + NOISE
+    // cannot simplify
+    // MIDPOINT = (MAX-MIN)/2
+
+    //big state 2
+    // MAX - DETUNE - NOISE < X < MAX + DETUNE + NOISE
+    // MAX - DETUNE - NOISE < X
+    // MIDPOINT = MAX
+
+    //small state 0
+    // X < MIDPOINT - NOISE
+
+    //small state 1
+    //else
+
+    //small state 2
+    // X > MIDPOINT + NOISE
+    */
+
+   //going off of config constants, not these anymore
+   //unsigned int min_loc = (ANALOG_MAX_LIM - ANALOG_MIN_LIM)/2 - profile->value_shift_main;
+   //unsigned int max_loc = min_loc + 2 * profile->value_shift_main;
+
+
+    // find large switch position
+    unsigned int midpoint = 0;
+    if(raw_data < ANALOG_MIN_LIM + DETUNE_VAL_SHIFT + NORMAL_NOISE_ERR)
+    {
+        profile->switch_main = 0;
+        midpoint = ANALOG_MIN_LIM;
+    }
+    else if(raw_data > ANALOG_MAX_LIM - DETUNE_VAL_SHIFT - NORMAL_NOISE_ERR)
+    {
+        profile->switch_main = 2;
+        midpoint = ANALOG_MAX_LIM;
+    }
+    else
+    {
+        profile->switch_main = 1;
+        midpoint = (ANALOG_MAX_LIM - ANALOG_MIN_LIM) / 2 + ANALOG_MIN_LIM;
+    }
+
+
+    //find small switch position
+    if(raw_data < midpoint - NORMAL_NOISE_ERR)
+    {
+        profile->switch_second = 0;
+    }
+    else if(raw_data > midpoint + NORMAL_NOISE_ERR)
+    {
+        profile->switch_second = 2;
+    }
+    else
+    {
+        profile->switch_second = 1;
+    }
+
 
 
 
@@ -173,17 +204,21 @@ void ControllerHandler::PrintRawChannels(uint16_t* channel_array, uint16_t array
     //test
     Serial.println();
 }
+void ControllerHandler::PrintProcessedChannels()
+{
+    for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
+    {
+        Serial.printf("Analog %d: Normal: %d\n", i, analog_channels[i].value_normalized);
+    }
+
+    for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
+    {
+        Serial.printf("Digital %d: SW 1: %d SW 2: %d\n", i, digital_channels[i].switch_main, digital_channels[i].switch_second);
+    }
+}
 
 
 
 
 
-
-
-
-
-
-
-
-
-
+#endif

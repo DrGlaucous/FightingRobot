@@ -43,13 +43,14 @@
 
 #define CHANNEL_COUNT ANALOG_CHANNEL_CNT + DIGITAL_CHANNEL_CNT
 
-//the range of the normalized analog values (mapped between [0,this), exclusive? or inclusive?)
+//the range of the normalized analog values (mapped between [0,this], exclusive? or --inclusive?)
+//adding detune will not affect these values
 #define NORMAL_MIN 0
 #define NORMAL_MAX 512
 
 
 //PPM config stuff is only really needed for the transmitter
-//#ifdef IS_CONTROLLER
+#ifdef IS_CONTROLLER
 
     //////NORMALIZATION CONSTANTS
 
@@ -57,14 +58,11 @@
     #define ANALOG_MIN_LIM 550
     #define ANALOG_MAX_LIM 970
 
-    //outlier removal is depricated in lieu of the updated PPM reading library
-    //how many reads to cache for outlier removal (bigger means slower and smoother signals)
-    //#define AVERAGE_POOL_CNT 3
-    //how far off an outlier should be before it is "corrected"
-    //#define OUTLIER_THRESH 40
 
-    //+- this ammount when calculating digital sums
-    #define NORMAL_NOISE_ERR 10
+    //+- this ammount when calculating digital sums (realtive to raw PPM input)
+    #define NORMAL_NOISE_ERR 5
+    //+- this ammount when the aux. switch is flipped (main switches use (ANALOG_MAX_LIM - ANALOG_MIN_LIM)/2)
+    #define DETUNE_VAL_SHIFT 64
 
 
     //////PPM LIBRARY CONFIG CONSTANTS
@@ -83,8 +81,8 @@
     //#define PPM_MIN_WAIT_VALUE 1000
     //#define PPM_IS_INVERTED false
 
-//#else
+#else
     //something
     #define KAKAJAMANGA
-//#endif
+#endif
 

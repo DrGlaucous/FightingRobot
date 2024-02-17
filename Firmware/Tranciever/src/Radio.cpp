@@ -74,6 +74,9 @@ response_status_t RadioHandler::CheckForResponse(packet_type_t* rx_packet_type, 
     //packet waiting in queue
     if(radio.receiveDone())
     {
+        //update keepalive time
+        last_rx_millis = millis();
+
         return AssembleRX(rx_packet_type, ack_packet);
     }
 
@@ -86,6 +89,19 @@ remote_ack_packet_t RadioHandler::GetLastResponsePacket()
 remote_control_packet_t RadioHandler::GetLastControlPacket()
 { return last_gotten_control;}
 
+//delta time
+uint64_t RadioHandler::GetTimeSinceLastPacket()
+{
+    uint64_t time_now = millis();
+    //detect overflows
+    if(time_now < last_rx_millis)
+        return time_now + (UINT64_MAX - last_rx_millis);
+    else
+        return time_now - last_rx_millis;
+
+
+}
+
 
 //custom ACK handler
 void RadioHandler::SendResponsePacket(remote_ack_packet_t ack_packet)
@@ -97,7 +113,6 @@ void RadioHandler::SendResponsePacket(remote_ack_packet_t ack_packet)
 }
 
 
-//int RadioHandler::SendPacket(void* packet, size_t size, uint8_t destination, bool ack)
 int RadioHandler::SendPacket(remote_control_packet_t packet, uint8_t destination, bool ack)
 {
     //enforce packettype
