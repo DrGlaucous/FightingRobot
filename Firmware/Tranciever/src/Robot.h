@@ -54,6 +54,226 @@ class BlinkerHandler
 };
 
 
+//for handling omniwheel base movement
+
+
+/*
+
+posititive direction, the wheels spin counterclockwise
+
+Wheel base:
+
+  front
+3/     \2
+
+   _
+   1
+
+//wheel 1's offset angle is 0
+//2's offset angle is +240 deg (4pi/3 rad)
+//3's offset angle is +120 deg (2pi/3 rad)
+
+Unit circle
+
+     PI/2
+      |
+      |
+      |
+PI------------0
+      |
+      |
+      |
+    3PI/2
+
+
+
+Char Unit circle, radius +-512
+
+
+      192
+       |
+       |
+       |
+0------------128
+       |
+       |
+       |
+       64
+
+
+*/
+
+
+
+class FastTrig
+{
+public:
+
+	//don't ask where I got this class...
+	//...CSE2. it was CSE2.
+
+    //constructor and destructor
+    FastTrig()
+    {
+        InitTriangleTable();
+    }
+    ~FastTrig() {}
+
+    int GetSin(unsigned char deg)
+    {
+        return gSin[deg];
+    }
+
+    int GetCos(unsigned char deg)
+    {
+        deg += 0x40;
+        return gSin[deg];
+    }
+
+	unsigned char GetArctan(int x, int y)
+	{
+		short k;
+		unsigned char a;
+
+		//use these to get coordiantes that work better with the screen coordiante system, where 0,0 is top left
+		//x *= -1;
+		//y *= -1;
+
+		a = 0;
+
+		//catch 0 values
+		if (x == 0 && y == 0)
+			return a;
+
+		if (x > 0)
+		{
+			if (y > 0)
+			{
+				if (x > y)
+				{
+					k = (y * 0x2000) / x;
+					while (k > gTan[a])
+						++a;
+				}
+				else
+				{
+					k = (x * 0x2000) / y;
+					while (k > gTan[a])
+						++a;
+					a = 0x40 - a;
+				}
+			}
+			else
+			{
+				if (x > -y)
+				{
+					k = (-y * 0x2000) / x;
+					while (k > gTan[a])
+						++a;
+					a = 0x100 - a;
+				}
+				else
+				{
+					k = (x * 0x2000) / -y;
+					while (k > gTan[a])
+						++a;
+					a = 0x100 - 0x40 + a;
+				}
+			}
+		}
+		else
+		{
+			if (y > 0)
+			{
+				if (-x > y)
+				{
+					k = (y * 0x2000) / -x;
+					while (k > gTan[a])
+						++a;
+					a = 0x80 - a;
+				}
+				else
+				{
+					k = (-x * 0x2000) / y;
+					while (k > gTan[a])
+						++a;
+					a = 0x40 + a;
+				}
+			}
+			else
+			{
+				if (-x > -y)
+				{
+					k = (-y * 0x2000) / -x;
+					while (k > gTan[a])
+						++a;
+					a = 0x80 + a;
+				}
+				else
+				{
+					k = (-x * 0x2000) / -y;
+					while (k > gTan[a])
+						++a;
+					a = 0x100 - 0x40 - a;
+				}
+			}
+		}
+
+		return a;
+	}
+
+
+	static float ConvertBackToRadians(unsigned char deg)
+	{
+		return (deg * 6.2831998 / 256.0);
+	}
+
+	static unsigned char ConvertToFastDegs(float radians)
+	{
+		return (unsigned char)floor(radians * 256.0 / (2.0 * PI));
+	}
+
+
+private:
+    //SINE maps 0-2pi to 0-256, so 128 = pi and 64 = pi/2, etc.
+    //COSINE simply offsets SINE by 0x40
+    //the unit circle has a radius of 512
+
+    int gSin[0x100];
+    short gTan[0x21];
+
+
+    void InitTriangleTable(void)
+    {
+        int i;
+
+
+        //sin(2*pi/deg_count)*radius
+
+        // Sine
+        for (i = 0; i < 0x100; ++i)
+            gSin[i] = (int)(sin(i * 6.2831998 / 256.0) * 512.0);
+
+        float a, b;
+
+        // Tangent
+        for (i = 0; i < 0x21; ++i)
+        {
+            a = (float)(i * 6.2831855f / 256.0f);
+            b = (float)sin(a) / (float)cos(a);
+            gTan[i] = (short)(b * 8192.0f);
+        }
+
+    }
+
+
+
+
+
+
+
+};
+
 
 //does all the roboty things (like movement, weapon handling, etc.)
 class RobotHandler
@@ -66,15 +286,55 @@ class RobotHandler
 
     void update();
 
+    //disable everything (emergency kill mode when no transmitter packets are recieved)
+    void pause();
+
+    //re-enable everything
+    void resume();
 
     private:
 
-    //for timing receptions
+    //for timing anything that needs time...
     unsigned long last_time = 0;
 
     RadioHandler* radio;
+    BlinkerHandler* blinker;
+    FastTrig* mr_trig;
 
-    //BlinkerHandler* blinker;
+    //servo objects (platform dependant)
+
+
+    //last packet read from the radio
+    //concatated_channels_t gotten_data = {};
+    
+    //wheelbase vectors x, y, rotation
+    int16_t xm, ym, rot_m= {};
+
+    int16_t mot1, mot2, mot3 = {};
+
+    //weapon location and speed
+    int16_t servo_angle = 0;
+    uint16_t esc_speed = 0;
+    bool esc_reversed = false; //CW vs CCW
+
+
+    bool is_flipped_over = false;
+    bool is_two_wheeled = false;
+    uint8_t broken_wheel = 0;
+
+    //put rx data into each specific variable
+    void MapControllerData();
+
+    //write processed data to each output
+    void SetWheelSpeedProportions();
+    void WriteMotors();
+
+
+
+
+
+
+
 
 
 };

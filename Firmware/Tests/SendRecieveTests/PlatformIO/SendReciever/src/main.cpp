@@ -5,7 +5,7 @@
 */
 
 #include <Arduino.h>
-//#include <Control_Surface.h>//an alternate MIDI library, but is not compatible with the STM32 (I originally inteded to use an ESP32)
+#include <SPI.h>
 #include "configuration.h"
 //#include "SendRecTest.h"
 #include "SparkfunTest.h"
@@ -40,6 +40,12 @@ void setup() {
 
     //pinMode(LED_BUILTIN, OUTPUT);
     setupFunc();
+    //problems();
+
+    //SPI.begin(26, 25, 33, 32);
+
+
+    Serial.begin(115200);
 }
 
 
@@ -53,7 +59,7 @@ void loop() {
         LiteOn = true;//only for one tick
 
         //digitalWrite(LED_BUILTIN, LiteOn);
-        //Serial.println(LiteOn);
+        Serial.println(LiteOn);
 
     }
 

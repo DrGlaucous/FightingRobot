@@ -84,5 +84,70 @@
 #else
     //something
     #define KAKAJAMANGA
+
+    //for the STM32, random pins are used for testing: this part of the code will be used on the ESP32
+
+
+    //no radio transmission for 1 second, robot shuts off
+    #define KEEPALIVE_TIMEOUT_MS 1000
+
+    //DRIVEBASE PINS
+
+    //h-bridge operation:
+    //HI-HI is break
+    //LO-LO is no connection
+    //HI-LO is dir 1
+    //LO-HI is dir 2
+    #define MOTOR_1A_PIN PB0
+    #define MOTOR_1B_PIN PB0
+
+    #define MOTOR_2A_PIN PB0
+    #define MOTOR_2B_PIN PB0
+
+    #define MOTOR_3A_PIN PB0
+    #define MOTOR_3B_PIN PB0
+
+    #define MOTOR_SLEEP_PIN PB0
+
+
+    //WEAPON PINS
+    #define SERVO_1_PIN PB14
+    #define SERVO_2_PIN PB15
+    #define ESC_PIN PA8
+
+    //control surface mapping
+    
+    //analog
+    #define X_IN 0
+    #define Y_IN 1
+    #define TURN_IN 2
+    #define SERVO_IN 3
+    #define ESC_IN 4
+    
+    //digital
+    #define FLIPOVER_IN 0
+    #define ESC_REVERSE_IN 1
+    #define TWO_MODE_IN 2
+    #define TWO_SELECT_IN 3
+
+    //normalization
+
+    //analog pins go from 0-255, so this must be within that range
+    #define XY_RADIUS 0xFF
+
+    #define SERVO_MIN 0
+    #define SERVO_MAX 180
+    //range of motion on one side
+    #define SERVO_RANGE 100
+
+    //dshot speeds
+    #define ESC_SPEED_MIDDLE 1024 //'0' in 3D mode
+    //full speed in 3D mode
+    #define ESC_SPEED_MIN 48
+    #define ESC_SPEED_MAX 2048
+
+
+
+
 #endif
 
