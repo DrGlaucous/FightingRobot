@@ -16,8 +16,15 @@
 #define IS_HIGH_POWER true
 
 //pins for the radio
-#define SLAVE_PIN PA4
-#define IRQ_PIN PB4
+#ifdef USING_STM32_BP
+    #define SLAVE_PIN PA4
+    #define IRQ_PIN PB4
+#elif USING_ESP32
+    #define SLAVE_PIN 26
+    #define IRQ_PIN 35
+#endif
+
+
 
 #define ENCRYPT       true // Set to "true" to use encryption
 #define ENCRYPTKEY    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
@@ -69,7 +76,11 @@
     //trigger on falling edge instead of rising edge (for futaba's weird 12 channel format)
     #define PPM_IS_INVERTED true
 
+#ifdef USING_STM32_BP
     #define PPM_INTURRUPT_PIN PA0
+#elif USING_ESP32
+    #define PPM_INTURRUPT_PIN 27
+#endif
     #define PPM_CHANNEL_COUNT CHANNEL_COUNT
     #define PPM_BLANK_TIME 5000
     #define PPM_MAX_WAIT_VALUE 1100
@@ -91,13 +102,17 @@
     //no radio transmission for 1 second, robot shuts off
     #define KEEPALIVE_TIMEOUT_MS 1000
 
-    //DRIVEBASE PINS
+    //slope mapping based on experimetnal data and resistor values (TODO: make this parametric)
+    #define VOLTMETER_SLOPE 0.0126 + 2.25
 
     //h-bridge operation:
     //HI-HI is break
     //LO-LO is no connection
     //HI-LO is dir 1
     //LO-HI is dir 2
+
+#ifdef USING_STM32_BP
+    //DRIVEBASE PINS
     #define MOTOR_1A_PIN PB0
     #define MOTOR_1B_PIN PB0
 
@@ -115,6 +130,30 @@
     #define SERVO_2_PIN PB15
     #define ESC_PIN PA8
 
+#elif USING_ESP32
+    //DRIVEBASE PINS
+    #define MOTOR_1A_PIN 16
+    #define MOTOR_1B_PIN 17
+
+    #define MOTOR_2A_PIN 18
+    #define MOTOR_2B_PIN 5
+
+    #define MOTOR_3A_PIN 22
+    #define MOTOR_3B_PIN 19
+
+    #define MOTOR_SLEEP_PIN 23
+
+
+    //WEAPON PINS
+    #define SERVO_1_PIN 2
+    #define SERVO_2_PIN 0
+    #define ESC_PIN 4
+
+    //OTHER
+    #define VOLTMETER_PIN 34
+
+#endif
+
     //control surface mapping
     
     //analog
@@ -123,6 +162,8 @@
     #define TURN_IN 2
     #define SERVO_IN 3
     #define ESC_IN 4
+    #define SERVO_MIN_IN 7
+    #define SERVO_MAX_IN 8
     
     //digital
     #define FLIPOVER_IN 0
@@ -137,14 +178,27 @@
 
     #define SERVO_MIN 0
     #define SERVO_MAX 180
-    //range of motion on one side
-    #define SERVO_RANGE 100
+    //range of motion on one side (depricated in favor of making this adjustable using the knobs on the remote)
+    //#define SERVO_RANGE 100
 
-    //dshot speeds
+    //number of magnets in the motor (for erpm measurements, only used in dshot mode)
+    #define MOTOR_POLE_COUNT 14
+
+#ifdef USING_STM32_BP
+    //PWM speeds
+    #define ESC_SPEED_MIDDLE 0 //'0' in 3D mode
+    //full speed in 3D mode
+    #define ESC_SPEED_MIN 0
+    #define ESC_SPEED_MAX 180
+#elif USING_ESP32
+    //dshot speeds (better than PWM, but only works with the dshot library)
     #define ESC_SPEED_MIDDLE 1024 //'0' in 3D mode
     //full speed in 3D mode
     #define ESC_SPEED_MIN 48
     #define ESC_SPEED_MAX 2048
+#endif
+
+
 
 
 

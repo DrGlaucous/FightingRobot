@@ -46,7 +46,10 @@ typedef struct remote_control_packet_s
 typedef struct remote_ack_packet_s
 {
     packet_type_t packettype = PACKET_RESPONSE_VALUES;
-    uint64_t hi_there = 0;
+    //uint64_t hi_there = 0;
+    uint32_t motor_rpm = 0;
+    float_t battery_voltage = 0.0;
+
 }remote_ack_packet_t;
 
 //all the settings for configuring the radio

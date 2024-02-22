@@ -65,15 +65,37 @@ if we detect a reset rollover, we then move the waiting signals over to the visi
 
 
 
+have roughly 7 Oz on frame
+
+1.295 allocated for screws, worst case
+
+5.705 left for frame
+(some screws can be ommitted/glue used instead)
+
+16 Oz max
+
+
+1.0005 - PCB + componets
+3.327 - wheels + n20s * 3
+1.01 - 2205
+0.30 - ESC
+0.976 - servos
+2 - battery
+1.295 - screws
+
+-9.88 for all of this
+
+2.196 - side walls
+
+6 Ounces/170 grams to work with
+
+Blade: 9g
 
 
 
 
 
-
-
-
-
+12.08 total rn + side walls
 
 
 

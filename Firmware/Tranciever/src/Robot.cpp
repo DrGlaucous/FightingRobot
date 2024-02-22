@@ -2,6 +2,7 @@
 
 #ifdef USING_ESP32
 #include <ESP32Servo.h>
+#include <DShotRMT.h>
 #elif USING_STM32_BP
 #include <STM32_ISR_Servo.h>
 #endif
@@ -13,6 +14,8 @@
 
 
 #ifndef IS_CONTROLLER
+
+
 
 
 
@@ -33,6 +36,25 @@ RobotHandler::RobotHandler()
     radio = new RadioHandler(startup_settings);
     blinker = new BlinkerHandler(LED_BUILTIN);
     mr_trig = new FastTrig();
+
+#ifdef USING_ESP32
+    //init esc, note: we assume the ESC is in 3D mode
+    esc = new DShotRMT(ESC_PIN);
+    esc->begin(DSHOT600, ENABLE_BIDIRECTION, MOTOR_POLE_COUNT);
+
+    servo_1 = new Servo();
+    servo_2 = new Servo();
+
+    servo_1->attach(SERVO_1_PIN);
+    servo_2->attach(SERVO_2_PIN);
+
+#elif USING_STM32_BP
+    //todo: add this
+#endif
+
+    //for voltmeter
+    pinMode(VOLTMETER_PIN, INPUT);
+
 }
 
 
@@ -44,44 +66,28 @@ RobotHandler::~RobotHandler()
 }
 
 
-
 void RobotHandler::update()
 {
-    blinker->update();
 
-    if(gTimer.DeltaTimeMillis(&last_time, 1000))
-    {
-        blinker->blink_lt(100);
-    }
+    //pulse test
+    // blinker->update();
+    // if(gTimer.DeltaTimeMillis(&last_time, 1000))
+    // {
+    //     blinker->blink_lt(100);
+    // }
+
+
 
     //prepare potenial response with latest data
     remote_ack_packet_t ackpt = {};
-    ackpt.hi_there = 99; //gotten_data.analog_channels[0];
-    //ackpt.hi_there = radio->GetLastControlPacket().channels[0];
+    ackpt.motor_rpm = esc_speed;
+    ackpt.battery_voltage = battery_voltage;
 
-    //sniff for packets
+    //sniff for packets (and send ack if we got any)
     response_status_t responsee = radio->CheckForResponse(NULL, ackpt);
-
-    //blink based on what we got
+    //perform action based on response type
     if(responsee == RX_SENT_ACK || responsee == RX_SUCCESS)
-    {
-        blinker->blink_lt(100);
-        
-
-        //dump recieved channels
-        for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
-        {
-            Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.analog_channels[i]);
-        }
-        Serial.printf("|//|");
-        for(int i = 0; i < DIGITAL_CHANNEL_CNT * 2; ++i)
-        {
-            Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.digital_channels[i]);
-        }
-        Serial.printf("\n");
-
-
-    }
+        DumpChannelPacket();
 
 
     //take rx packets and format them for each application
@@ -95,6 +101,25 @@ void RobotHandler::update()
 
 
 
+}
+
+
+void RobotHandler::DumpChannelPacket()
+{
+    blinker->blink_lt(100);
+    
+
+    //dump recieved channels
+    for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
+    {
+        Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.analog_channels[i]);
+    }
+    Serial.printf("|//|");
+    for(int i = 0; i < DIGITAL_CHANNEL_CNT * 2; ++i)
+    {
+        Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.digital_channels[i]);
+    }
+    Serial.printf("\n");
 }
 
 
@@ -112,11 +137,14 @@ void RobotHandler::MapControllerData()
     broken_wheel = gotten_data.analog_channels[TWO_SELECT_IN];
     esc_reversed = gotten_data.analog_channels[ESC_REVERSE_IN];
 
+    //from the knobs, controls how far the servo arm will rotoate with the stick
+    servo_angle_min = map(gotten_data.analog_channels[SERVO_MIN_IN], NORMAL_MIN, NORMAL_MAX, SERVO_MIN, SERVO_MAX);
+    servo_angle_max = map(gotten_data.analog_channels[SERVO_MAX_IN], NORMAL_MIN, NORMAL_MAX, SERVO_MIN, SERVO_MAX);
 
-    //reverse mapping happens later (because both servos take different values)
-    servo_angle = map(gotten_data.analog_channels[SERVO_IN], NORMAL_MIN, NORMAL_MAX, 0, SERVO_RANGE);
+    //reverse mapping (for servo) happens later (because both servos take different values)
+    servo_angle = map(gotten_data.analog_channels[SERVO_IN], NORMAL_MIN, NORMAL_MAX, servo_angle_min, servo_angle_max);
 
-    //handles reverse mapping
+    //handles reverse mapping (for ESC)
     esc_speed = map(gotten_data.analog_channels[ESC_IN], NORMAL_MIN, NORMAL_MAX, ESC_SPEED_MIDDLE, (is_flipped_over ^ esc_reversed) ? ESC_SPEED_MAX : ESC_SPEED_MIN);
 
 
@@ -160,6 +188,10 @@ void RobotHandler::SetWheelSpeedProportions()
     if(mot3 < -XY_RADIUS)
         mot3 = -XY_RADIUS;
 
+    //flip motors based on reversed case:
+    //todo: this
+
+
 	//traditional trig method:
 	//*wheel_1 = cos(angle);
     //*wheel_2 = cos(angle + 4 * PI / 3.0);
@@ -170,6 +202,7 @@ void RobotHandler::SetWheelSpeedProportions()
 
 void RobotHandler::WriteMotors()
 {
+    //write drivebase
     analogWrite(MOTOR_1A_PIN, mot1 < 0? 0: mot1);
     analogWrite(MOTOR_1B_PIN, mot1 > 0? mot1: 0);
 
@@ -178,9 +211,33 @@ void RobotHandler::WriteMotors()
 
     analogWrite(MOTOR_3A_PIN, mot3 < 0? 0: mot3);
     analogWrite(MOTOR_3B_PIN, mot3 > 0? mot3: 0);
+
+    //write servos (using degrees)
+    auto mirrored_servo_angle = map(servo_angle, servo_angle_min, servo_angle_max, servo_angle_max, servo_angle_min);
+    servo_1->write(is_flipped_over? mirrored_servo_angle : servo_angle);
+    servo_2->write(is_flipped_over? servo_angle : mirrored_servo_angle);
+
+
+
+    //write ESC
+#ifdef USING_ESP32
+    if(gTimer.DeltaTimeMillis(&last_esc_time, 2))
+    {
+        esc->send_dshot_value(esc_speed);
+        auto error_t = esc->get_dshot_packet(&esc_speed);
+    }
+#elif USING_STM32_BP
+    //todo: add this
+#endif
+
+
 }
 
 
+void RobotHandler::ReadVoltage()
+{
+    battery_voltage = analogRead(VOLTMETER_PIN) * VOLTMETER_SLOPE;
+}
 
 
 

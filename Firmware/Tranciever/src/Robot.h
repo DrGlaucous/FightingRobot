@@ -6,6 +6,13 @@
 #include "configuration.h"
 #include "TimerTick.h"
 
+#ifdef USING_ESP32
+#include <ESP32Servo.h>
+#include <DShotRMT.h>
+#elif USING_STM32_BP
+#include <STM32_ISR_Servo.h>
+#endif
+
 
 #ifndef IS_CONTROLLER
 
@@ -292,16 +299,31 @@ class RobotHandler
     //re-enable everything
     void resume();
 
+    //read voltage directly to internal variable (float form)
+    void ReadVoltage();
+
     private:
 
     //for timing anything that needs time...
     unsigned long last_time = 0;
 
+    //used to update the ESC output (only in dshot mode)
+    unsigned long last_esc_time = 0;
+
     RadioHandler* radio;
     BlinkerHandler* blinker;
     FastTrig* mr_trig;
 
-    //servo objects (platform dependant)
+
+
+#ifdef USING_ESP32
+    DShotRMT* esc;
+    Servo* servo_1;
+    Servo* servo_2;
+#elif USING_STM32_BP
+    //todo: servos
+#endif
+
 
 
     //last packet read from the radio
@@ -314,6 +336,9 @@ class RobotHandler
 
     //weapon location and speed
     int16_t servo_angle = 0;
+    int16_t servo_angle_min = 0;
+    int16_t servo_angle_max = 0;
+
     uint16_t esc_speed = 0;
     bool esc_reversed = false; //CW vs CCW
 
@@ -322,6 +347,9 @@ class RobotHandler
     bool is_two_wheeled = false;
     uint8_t broken_wheel = 0;
 
+
+    float_t battery_voltage = 0.0;
+
     //put rx data into each specific variable
     void MapControllerData();
 
@@ -329,12 +357,8 @@ class RobotHandler
     void SetWheelSpeedProportions();
     void WriteMotors();
 
-
-
-
-
-
-
+    //test: dump channels to serial monitor
+    void DumpChannelPacket();
 
 
 };
