@@ -56,7 +56,7 @@ void TransmitterHandler::update()
         //if transmit success print the bounceback time
         if(!radio->SendPacket(packet_out, RECEIVERNODEID, USEACK))
         {
-            Serial.printf("%d\n", radio->GetLastResponsePacket().hi_there);
+            Serial.printf("%f\n", radio->GetLastResponsePacket().battery_voltage);
         }
     }
 }

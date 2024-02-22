@@ -45,8 +45,9 @@ RobotHandler::RobotHandler()
     servo_1 = new Servo();
     servo_2 = new Servo();
 
-    servo_1->attach(SERVO_1_PIN);
-    servo_2->attach(SERVO_2_PIN);
+    //moved to resume()
+    //servo_1->attach(SERVO_1_PIN);
+    //servo_2->attach(SERVO_2_PIN);
 
 #elif USING_STM32_BP
     //todo: add this
@@ -54,6 +55,21 @@ RobotHandler::RobotHandler()
 
     //for voltmeter
     pinMode(VOLTMETER_PIN, INPUT);
+
+    //for motors
+    pinMode(MOTOR_1A_PIN, OUTPUT);
+    pinMode(MOTOR_1B_PIN, OUTPUT);
+
+    pinMode(MOTOR_2A_PIN, OUTPUT);
+    pinMode(MOTOR_2B_PIN, OUTPUT);
+
+    pinMode(MOTOR_3A_PIN, OUTPUT);
+    pinMode(MOTOR_3B_PIN, OUTPUT);
+
+    pinMode(MOTOR_SLEEP_PIN, OUTPUT);
+
+
+    resume();
 
 }
 
@@ -100,6 +116,30 @@ void RobotHandler::update()
     WriteMotors();
 
 
+
+}
+
+
+void RobotHandler::pause()
+{
+    servo_1->detach();
+    servo_2->detach();
+
+    //disable wheelbase
+    digitalWrite(MOTOR_SLEEP_PIN, LOW);
+
+    //no need to disable ESC: simply not writing to it will disable it (esp32)
+
+}
+
+
+void RobotHandler::resume()
+{
+    servo_1->attach(SERVO_1_PIN);
+    servo_2->attach(SERVO_2_PIN);
+
+    //enable wheelbase
+    digitalWrite(MOTOR_SLEEP_PIN, HIGH);
 
 }
 
