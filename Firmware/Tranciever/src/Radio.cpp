@@ -12,7 +12,7 @@ RadioHandler::RadioHandler(radio_handler_config_datapack_t settings)
 {
 
     radio.setCS(settings.slave_sel_pin);
-    radio.setIrq(settings.irq_pin);
+    radio.setIrq(settings.irq_pin); 
     radio.initialize(settings.frequency, settings.this_id, settings.network_id);
 
 
