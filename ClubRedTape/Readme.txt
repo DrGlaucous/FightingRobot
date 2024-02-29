@@ -17,4 +17,7 @@ ASM Ids:
 3 - drivebase
 4 - weapon1
 5 - weapon2
-6 - ground game (?)
+6 - ground game (wedges/forks)
+
+
+(also, it all has to be in solidworks, for some reason...)
