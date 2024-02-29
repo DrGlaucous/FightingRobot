@@ -87,7 +87,10 @@ void setupFunc()
 	// radio = new RFM69(32, 35, true, &SPI);
 
 	// alt settings for STM32
-	radio = new RFM69(PA4, PB4, true, &SPI);
+	//SPIClass* thisspi = new SPIClass(); //SPIClass(PA7, PA6, PA5, PA4);
+	//SPI.setMOSI(PB5);
+
+	radio = new RFM69(PA4, PA10, true, &SPI);
 	//radio->setCS(PA4);
     //radio->setIrq(PB4);
 
