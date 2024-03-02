@@ -3,18 +3,18 @@
 
 #include <Arduino.h>
 #include <RFM69.h>
+#include <SPI.h>
 
 #include "configuration.h"
 
 #include "Controller.h"
 
-
-
+//note: this is for readability, the packet must be cast to a char for transmission
 typedef enum packet_type_e
 {
-    PACKET_NULL = 0,
-    PACKET_CONTROL_VALUES,
-    PACKET_RESPONSE_VALUES,
+    PACKET_NULL = 0x00,
+    PACKET_CONTROL_VALUES = 0x01,
+    PACKET_RESPONSE_VALUES = 0x02,
 }packet_type_t;
 
 
@@ -29,10 +29,9 @@ typedef enum response_status_e
 //packet sent from the controller to the machine
 
 // To force compiler to use 1 byte packaging 
-#pragma pack(1) 
 typedef struct remote_control_packet_s
 {
-    packet_type_t packettype = PACKET_CONTROL_VALUES;
+    uint8_t packettype = PACKET_CONTROL_VALUES;
 
     //uint16_t channels[CHANNEL_COUNT] = {};
     concatated_channels_t channels = {};
@@ -63,6 +62,8 @@ typedef struct radio_handler_config_datapack_s
     bool is_hw; //is the high-power variant
     bool should_encrypt; //use the encryption key
     char encrypt_key[17]; //key must be 16 bytes long (+1 for null terminator)
+
+    SPIClass* spi; //pointer to SPI bus
 
 }radio_handler_config_datapack_t;
 
@@ -96,7 +97,7 @@ class RadioHandler
     response_status_t AssembleRX(packet_type_t* packet_type, remote_ack_packet_t ack_packet = {});
 
     //radio module
-    RFM69 radio;
+    RFM69* radio;
 
     //these are where the fresh values are placed when a response is recieved
     remote_ack_packet_t last_gotten_response = {};

@@ -14,6 +14,11 @@
 
 TransmitterHandler::TransmitterHandler()
 {
+#ifdef USING_ESP32
+    //set up SPI matrix on ESP32 (can use non-default pins)
+    SPI.begin(SPI_SCK_PIN, SPI_MISO_PIN, SPI_MOSI_PIN, SPI_NSS_PIN);
+#endif
+
     auto startup_settings = radio_handler_config_datapack_t
     {
         SLAVE_PIN,
@@ -24,6 +29,7 @@ TransmitterHandler::TransmitterHandler()
         IS_HIGH_POWER,
         ENCRYPT,
         ENCRYPTKEY,
+        &SPI,
     };
     radio = new RadioHandler(startup_settings);
 

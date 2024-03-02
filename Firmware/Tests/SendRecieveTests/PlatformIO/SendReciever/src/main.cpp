@@ -34,11 +34,20 @@ void GetTicks(void)
 
 }
 
-
+#define MOT_A1 22
+#define MOT_A2 19
+#define MOT_B1 18
+#define MOT_B2 5
 
 void setup() {
 
     //pinMode(LED_BUILTIN, OUTPUT);
+
+    pinMode(MOT_A1, OUTPUT);
+    pinMode(MOT_A2, OUTPUT);
+    pinMode(MOT_B1, OUTPUT);
+    pinMode(MOT_B2, OUTPUT);
+
     setupFunc();
     //problems();
 
@@ -53,13 +62,18 @@ void loop() {
 
     GetTicks();
 
-    int LiteOn  = false;
+    static int LiteOn  = 0;
     if(MillisecondTicks % 500 == 0 && MillisecondTicks != LastMillisecondTicks)
     {
-        LiteOn = true;//only for one tick
+        ++LiteOn;// = true;//only for one tick
 
-        //digitalWrite(LED_BUILTIN, LiteOn);
+        //digitalWrite(LED_BUILTIN, LiteOn % 2);
         Serial.println(LiteOn);
+
+        digitalWrite(MOT_A1, LiteOn % 4);
+        digitalWrite(MOT_A2, !(LiteOn % 4));
+        digitalWrite(MOT_B1, LiteOn % 4);
+        digitalWrite(MOT_B2, !(LiteOn % 4));
 
     }
 

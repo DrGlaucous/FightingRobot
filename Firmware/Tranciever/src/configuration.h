@@ -17,11 +17,22 @@
 
 //pins for the radio
 #ifdef USING_STM32_BP
+    //final setup
     #define SLAVE_PIN PA4
-    #define IRQ_PIN PB4
+    #define IRQ_PIN PC14
+
+    //testing setup (littleBuddies)
+    //#define SLAVE_PIN PA4
+    //#define IRQ_PIN PB4
+
 #elif USING_ESP32
-    #define SLAVE_PIN 26
+    #define SLAVE_PIN 32
     #define IRQ_PIN 35
+
+    #define SPI_SCK_PIN 26
+    #define SPI_MISO_PIN 25
+    #define SPI_MOSI_PIN 33
+    #define SPI_NSS_PIN SLAVE_PIN
 #endif
 
 
@@ -36,7 +47,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-#define IS_CONTROLLER
+//#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////
@@ -77,7 +88,7 @@
     #define PPM_IS_INVERTED true
 
 #ifdef USING_STM32_BP
-    #define PPM_INTURRUPT_PIN PA0
+    #define PPM_INTURRUPT_PIN PB11
 #elif USING_ESP32
     #define PPM_INTURRUPT_PIN 27
 #endif
@@ -123,6 +134,8 @@
     #define MOTOR_3B_PIN PB0
 
     #define MOTOR_SLEEP_PIN PB0
+
+    #define VOLTMETER_PIN PB0
 
 
     //WEAPON PINS

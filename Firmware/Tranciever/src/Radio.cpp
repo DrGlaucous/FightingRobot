@@ -10,19 +10,22 @@
 
 RadioHandler::RadioHandler(radio_handler_config_datapack_t settings)
 {
-
-    radio.setCS(settings.slave_sel_pin);
-    radio.setIrq(settings.irq_pin); 
-    radio.initialize(settings.frequency, settings.this_id, settings.network_id);
-
+    radio = new RFM69(settings.slave_sel_pin, settings.irq_pin, settings.spi);
+    //now set above
+    //radio.setCS(settings.slave_sel_pin);
+    //radio.setIrq(settings.irq_pin); 
+    radio->initialize(settings.frequency, settings.this_id, settings.network_id);
+    if(settings.is_hw)
+        radio->setHighPower();
 
     if(settings.should_encrypt)
-        radio.encrypt(settings.encrypt_key);
+        radio->encrypt(settings.encrypt_key);
 }
 
 RadioHandler::~RadioHandler()
 {
     //nothing to do for now
+    delete(radio);
 }
 
 
@@ -31,7 +34,7 @@ response_status_t RadioHandler::AssembleRX(packet_type_t* packet_type,  remote_a
 {
     //figure out what packet we got
     packet_type_t rx_type;
-    memcpy(&rx_type, radio.DATA, sizeof(packet_type_t));
+    memcpy(&rx_type, radio->DATA, sizeof(uint8_t));
 
     //copy gotten packet to the cache
     switch(rx_type)
@@ -41,15 +44,15 @@ response_status_t RadioHandler::AssembleRX(packet_type_t* packet_type,  remote_a
             break;
         case PACKET_CONTROL_VALUES:
         {
-            memcpy(&last_gotten_control, radio.DATA, radio.DATALEN);
-            last_rssi = radio.RSSI;
+            memcpy(&last_gotten_control, radio->DATA, radio->DATALEN);
+            last_rssi = radio->RSSI;
         }
         break;
         case PACKET_RESPONSE_VALUES:
         {
             //Serial.printf("Got ACK\n");
-            memcpy(&last_gotten_response, radio.DATA, radio.DATALEN);
-            last_rssi = radio.RSSI;
+            memcpy(&last_gotten_response, radio->DATA, radio->DATALEN);
+            last_rssi = radio->RSSI;
         }
         break;
     }
@@ -59,7 +62,7 @@ response_status_t RadioHandler::AssembleRX(packet_type_t* packet_type,  remote_a
         *packet_type = rx_type;
 
     //send data back if ACK was requested
-    if (radio.ACKRequested())
+    if (radio->ACKRequested())
     {
         SendResponsePacket(ack_packet);
         return RX_SENT_ACK;
@@ -72,7 +75,7 @@ response_status_t RadioHandler::AssembleRX(packet_type_t* packet_type,  remote_a
 response_status_t RadioHandler::CheckForResponse(packet_type_t* rx_packet_type, remote_ack_packet_t ack_packet)
 {
     //packet waiting in queue
-    if(radio.receiveDone())
+    if(radio->receiveDone())
     {
         //update keepalive time
         last_rx_millis = millis();
@@ -108,7 +111,7 @@ void RadioHandler::SendResponsePacket(remote_ack_packet_t ack_packet)
 {
     //Serial.printf("Sent ACK\n");
 
-    radio.sendACK(&ack_packet, sizeof(remote_ack_packet_t));
+    radio->sendACK(&ack_packet, sizeof(remote_ack_packet_t));
 
 }
 
@@ -121,7 +124,7 @@ int RadioHandler::SendPacket(remote_control_packet_t packet, uint8_t destination
 
     if(ack)
     {
-        if(radio.sendWithRetry(destination, &packet, size))
+        if(radio->sendWithRetry(destination, &packet, size))
         {
             //got ack
             
@@ -138,7 +141,7 @@ int RadioHandler::SendPacket(remote_control_packet_t packet, uint8_t destination
     }
     else
     {
-        radio.send(destination, &packet, size);
+        radio->send(destination, &packet, size);
         return 0; //success
     }
 

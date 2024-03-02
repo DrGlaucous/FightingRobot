@@ -22,20 +22,6 @@
 
 RobotHandler::RobotHandler()
 {
-    auto startup_settings = radio_handler_config_datapack_t
-    {
-        SLAVE_PIN,
-        IRQ_PIN,
-        FREQUENCY,
-        RECEIVERNODEID,
-        NETWORKID,
-        IS_HIGH_POWER,
-        ENCRYPT,
-        ENCRYPTKEY,
-    };
-    radio = new RadioHandler(startup_settings);
-    blinker = new BlinkerHandler(LED_BUILTIN);
-    mr_trig = new FastTrig();
 
 #ifdef USING_ESP32
     //init esc, note: we assume the ESC is in 3D mode
@@ -49,9 +35,33 @@ RobotHandler::RobotHandler()
     //servo_1->attach(SERVO_1_PIN);
     //servo_2->attach(SERVO_2_PIN);
 
+    //set up SPI matrix on ESP32 (can use non-default pins)
+    SPI.begin(SPI_SCK_PIN, SPI_MISO_PIN, SPI_MOSI_PIN, SPI_NSS_PIN);
+
 #elif USING_STM32_BP
     //todo: add this
+
+    //stm32 has weird problems when specifying non-default SPI pins
 #endif
+
+
+    auto startup_settings = radio_handler_config_datapack_t
+    {
+        SLAVE_PIN,
+        IRQ_PIN,
+        FREQUENCY,
+        RECEIVERNODEID,
+        NETWORKID,
+        IS_HIGH_POWER,
+        ENCRYPT,
+        ENCRYPTKEY,
+        &SPI,
+    };
+    radio = new RadioHandler(startup_settings);
+    blinker = new BlinkerHandler(LED_BUILTIN);
+    mr_trig = new FastTrig();
+
+
 
     //for voltmeter
     pinMode(VOLTMETER_PIN, INPUT);
@@ -122,9 +132,11 @@ void RobotHandler::update()
 
 void RobotHandler::pause()
 {
+
+#ifdef USING_ESP32
     servo_1->detach();
     servo_2->detach();
-
+#endif
     //disable wheelbase
     digitalWrite(MOTOR_SLEEP_PIN, LOW);
 
@@ -135,8 +147,10 @@ void RobotHandler::pause()
 
 void RobotHandler::resume()
 {
+#ifdef USING_ESP32
     servo_1->attach(SERVO_1_PIN);
     servo_2->attach(SERVO_2_PIN);
+#endif
 
     //enable wheelbase
     digitalWrite(MOTOR_SLEEP_PIN, HIGH);
@@ -252,15 +266,17 @@ void RobotHandler::WriteMotors()
     analogWrite(MOTOR_3A_PIN, mot3 < 0? 0: mot3);
     analogWrite(MOTOR_3B_PIN, mot3 > 0? mot3: 0);
 
-    //write servos (using degrees)
-    auto mirrored_servo_angle = map(servo_angle, servo_angle_min, servo_angle_max, servo_angle_max, servo_angle_min);
-    servo_1->write(is_flipped_over? mirrored_servo_angle : servo_angle);
-    servo_2->write(is_flipped_over? servo_angle : mirrored_servo_angle);
 
 
 
     //write ESC
 #ifdef USING_ESP32
+
+    //write servos (using degrees)
+    auto mirrored_servo_angle = servo_angle_max == servo_angle_min ? servo_angle_min : map(servo_angle, servo_angle_min, servo_angle_max, servo_angle_max, servo_angle_min);
+    servo_1->write(is_flipped_over? mirrored_servo_angle : servo_angle);
+    servo_2->write(is_flipped_over? servo_angle : mirrored_servo_angle);
+
     if(gTimer.DeltaTimeMillis(&last_esc_time, 2))
     {
         esc->send_dshot_value(esc_speed);

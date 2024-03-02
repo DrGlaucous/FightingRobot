@@ -82,15 +82,15 @@ void setupFunc()
 	Serial.println(" ready");
 
 	// alt settings for ESP32
-	// SPI.begin(SCK, MISO, MOSI, SS);
-	// SPI.begin(26, 25, 33, 32);
-	// radio = new RFM69(32, 35, true, &SPI);
+	//SPI.begin(SCK, MISO, MOSI, SS);
+	SPI.begin(26, 25, 33, 32);
+	radio = new RFM69(32, 35, true, &SPI);
 
 	// alt settings for STM32
 	//SPIClass* thisspi = new SPIClass(); //SPIClass(PA7, PA6, PA5, PA4);
 	//SPI.setMOSI(PB5);
 
-	radio = new RFM69(PA4, PA10, true, &SPI);
+	//radio = new RFM69(PA4, PA10, true, &SPI);
 	//radio->setCS(PA4);
     //radio->setIrq(PB4);
 
