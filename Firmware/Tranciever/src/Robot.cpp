@@ -112,8 +112,8 @@ void RobotHandler::update()
     //sniff for packets (and send ack if we got any)
     response_status_t responsee = radio->CheckForResponse(NULL, ackpt);
     //perform action based on response type
-    if(responsee == RX_SENT_ACK || responsee == RX_SUCCESS)
-        DumpChannelPacket();
+    //if(responsee == RX_SENT_ACK || responsee == RX_SUCCESS)
+    //    DumpChannelPacket();
 
 
     //take rx packets and format them for each application
@@ -181,8 +181,17 @@ void RobotHandler::MapControllerData()
 {
     auto gotten_data = radio->GetLastControlPacket().channels;
 
+
+    if(gotten_data.analog_channels[TURN_IN] > 300 || gotten_data.analog_channels[TURN_IN] < 240)
+    {
+        Serial.println(gotten_data.analog_channels[TURN_IN]);
+    }
+
+
     xm = map(gotten_data.analog_channels[X_IN], NORMAL_MIN, NORMAL_MAX, -XY_RADIUS, XY_RADIUS);
     ym = map(gotten_data.analog_channels[Y_IN], NORMAL_MIN, NORMAL_MAX, -XY_RADIUS, XY_RADIUS);
+
+
     rot_m = map(gotten_data.analog_channels[TURN_IN], NORMAL_MIN, NORMAL_MAX, -XY_RADIUS, XY_RADIUS);
 
 
@@ -210,19 +219,27 @@ void RobotHandler::MapControllerData()
 
 void RobotHandler::SetWheelSpeedProportions()
 {
+    //Serial.printf("XM: %d\tYM %d\n", xm, ym);
+    //xm = 0;
+    //ym = XY_RADIUS;
+
+
+    //rot_m = 0;
 
     //vector magnitude
     unsigned short magnitiude = (unsigned short)sqrt(xm*xm + ym*ym);
     if(magnitiude > XY_RADIUS)
         magnitiude = XY_RADIUS;
+
+    //Serial.println(magnitiude);
     
     //vector direction
 	unsigned char angle = mr_trig->GetArctan(xm, ym);
 
     //fast trig radius is 512
-	mot1 = map(mr_trig->GetCos(angle), 0, 512, 0, XY_RADIUS) + rot_m;
-	mot2 = map(mr_trig->GetCos(angle + 512 / 3), 0, 512, 0, XY_RADIUS) + rot_m; //values are not exact, but are close enough in terms of integer offset
-	mot3 = map(mr_trig->GetCos(angle + 256 / 3), 0, 512, 0, XY_RADIUS) + rot_m;
+	mot1 = map(mr_trig->GetCos(angle), 0, 512, 0, magnitiude) + rot_m;
+	mot2 = map(mr_trig->GetCos(angle + 512 / 3), 0, 512, 0, magnitiude) + rot_m; //values are not exact, but are close enough in terms of integer offset
+	mot3 = map(mr_trig->GetCos(angle + 256 / 3), 0, 512, 0, magnitiude) + rot_m;
 
     //probably a more efficient way to do this...
 
@@ -242,6 +259,9 @@ void RobotHandler::SetWheelSpeedProportions()
     if(mot3 < -XY_RADIUS)
         mot3 = -XY_RADIUS;
 
+
+    //Serial.printf("Mot1: %-4d Mot2: %-4d Mot3: %-4d\n", mot1, mot2, mot3);
+
     //flip motors based on reversed case:
     //todo: this
 
@@ -258,13 +278,13 @@ void RobotHandler::WriteMotors()
 {
     //write drivebase
     analogWrite(MOTOR_1A_PIN, mot1 < 0? 0: mot1);
-    analogWrite(MOTOR_1B_PIN, mot1 > 0? mot1: 0);
+    analogWrite(MOTOR_1B_PIN, mot1 < 0? -mot1: 0);
 
     analogWrite(MOTOR_2A_PIN, mot2 < 0? 0: mot2);
-    analogWrite(MOTOR_2B_PIN, mot2 > 0? mot2: 0);
+    analogWrite(MOTOR_2B_PIN, mot2 < 0? -mot2: 0);
 
     analogWrite(MOTOR_3A_PIN, mot3 < 0? 0: mot3);
-    analogWrite(MOTOR_3B_PIN, mot3 > 0? mot3: 0);
+    analogWrite(MOTOR_3B_PIN, mot3 < 0? -mot3: 0);
 
 
 

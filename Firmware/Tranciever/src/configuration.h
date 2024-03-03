@@ -145,14 +145,18 @@
 
 #elif USING_ESP32
     //DRIVEBASE PINS
-    #define MOTOR_1A_PIN 16
-    #define MOTOR_1B_PIN 17
 
-    #define MOTOR_2A_PIN 18
-    #define MOTOR_2B_PIN 5
+    //is 1, should be 3
+    #define MOTOR_3A_PIN 17
+    #define MOTOR_3B_PIN 16
 
-    #define MOTOR_3A_PIN 22
-    #define MOTOR_3B_PIN 19
+    //is 2, should be 1
+    #define MOTOR_1A_PIN 18
+    #define MOTOR_1B_PIN 5
+
+    //is 3, should be 2
+    #define MOTOR_2A_PIN 19
+    #define MOTOR_2B_PIN 22
 
     #define MOTOR_SLEEP_PIN 23
 
@@ -172,8 +176,8 @@
     //analog
     #define X_IN 0
     #define Y_IN 1
-    #define TURN_IN 2
-    #define SERVO_IN 3
+    #define TURN_IN 3
+    #define SERVO_IN 2
     #define ESC_IN 4
     #define SERVO_MIN_IN 7
     #define SERVO_MAX_IN 8
