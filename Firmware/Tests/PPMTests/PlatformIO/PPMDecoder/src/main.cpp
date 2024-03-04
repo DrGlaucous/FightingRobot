@@ -13,7 +13,18 @@ unsigned long LastMillisecondTicks{};//previous values
 unsigned long LastMicrosecondTicks{};
 
 //Initialize a PPMReader on digital pin 3 with 6 expected channels.
-uint32_t interruptPin = PA0;
+
+#ifdef USING_STM32
+#define IRQ_PIN PA0
+#elif USING_ARDUINO
+//non-analog pins can be delcared using digits in arduino
+#define IRQ_PIN 2
+#else
+#define IRQ_PIN -1
+#endif
+
+uint32_t interruptPin = IRQ_PIN;
+
 byte channelAmount = 12;
 PPMReader ppm(interruptPin, channelAmount, 1);
 
