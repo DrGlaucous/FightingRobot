@@ -56,7 +56,11 @@ void TransmitterHandler::update()
         //ready packet
         remote_control_packet_t packet_out = {};
         packet_out.channels = controller->GetReadyPacket();
-        //packet_out.channels.analog_channels[0] = 303;
+        packet_out.channels.analog_channels[3] = 255;
+        //if(packet_out.channels.analog_channels[3] > 300 || packet_out.channels.analog_channels[3] > 240)
+        //{
+        //    Serial.println(packet_out.channels.analog_channels[3]);
+        //}
 
 
         //if transmit success print the bounceback time
