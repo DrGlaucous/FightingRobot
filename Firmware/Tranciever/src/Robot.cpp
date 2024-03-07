@@ -299,8 +299,8 @@ void RobotHandler::WriteMotors()
 
     if(gTimer.DeltaTimeMillis(&last_esc_time, 2))
     {
-        esc->send_dshot_value(esc_speed);
-        auto error_t = esc->get_dshot_packet(&esc_speed);
+        //esc->send_dshot_value(esc_speed);
+        //auto error_t = esc->get_dshot_packet(&esc_speed);
     }
 #elif USING_STM32_BP
     //todo: add this

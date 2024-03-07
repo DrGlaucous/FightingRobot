@@ -47,7 +47,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-#define IS_CONTROLLER
+//#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////

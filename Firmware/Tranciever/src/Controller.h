@@ -103,7 +103,7 @@ class ControllerHandler
     ~ControllerHandler();
 
     //runs both the PPM getter and the normalizer for any new inputs
-    void update();
+    bool update();
 
 
     //using the initial config, normalizes an array of PPM values

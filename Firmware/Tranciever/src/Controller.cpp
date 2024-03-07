@@ -26,13 +26,21 @@ ControllerHandler::~ControllerHandler()
 }
 
 
-void ControllerHandler::update()
+bool ControllerHandler::update()
 {
     //get PPM from remote
     GetControlSurface(p_channels, PPM_CHANNEL_COUNT);
     
-    //[test] print the rolling index
-    //Serial.printf("%d, %d \n",this_index, last_index);
+
+    //check if values are OOB (report error if so, this usually means the transmitter is being turned on)
+    bool has_err = false;
+    for(int i = 0; i < PPM_CHANNEL_COUNT; ++i)
+    {
+        if(p_channels[i] < PPM_MIN_WAIT_VALUE || p_channels[i] > PPM_MAX_WAIT_VALUE)
+        {
+            has_err = true;
+        }
+    }
 
 
     //test
@@ -50,7 +58,7 @@ void ControllerHandler::update()
     }
 
     //PrintProcessedChannels();
-
+    return has_err;
 
 }
 

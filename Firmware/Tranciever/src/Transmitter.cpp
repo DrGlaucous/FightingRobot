@@ -49,21 +49,32 @@ void TransmitterHandler::update()
     //5 ms have elapsed
     if(gTimer.DeltaTimeMillis(&last_time, 5))
     {
-        controller->update();
 
-        //transmit packet
+        if(controller->update())
+            return;
 
-        //ready packet
+
+        //ready the packet
         remote_control_packet_t packet_out = {};
         packet_out.channels = controller->GetReadyPacket();
-        packet_out.channels.analog_channels[3] = 255;
-        //if(packet_out.channels.analog_channels[3] > 300 || packet_out.channels.analog_channels[3] > 240)
-        //{
-        //    Serial.println(packet_out.channels.analog_channels[3]);
-        //}
 
 
-        //if transmit success print the bounceback time
+        // test: check for error values (we seem to be getting those)
+        // packet_out.channels.analog_channels[3] = 255;
+        // bool wrongful = false;
+        // for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
+        // {
+        //     if(packet_out.channels.analog_channels[i] > 300 || packet_out.channels.analog_channels[i] < 240)
+        //     {
+        //         wrongful = true;
+        //         Serial.printf("%d || ", packet_out.channels.analog_channels[i]);
+        //     }
+        // }
+        // if(wrongful)
+        //     Serial.printf("\n");
+
+
+        //if transmit success, print the bounceback packet
         if(!radio->SendPacket(packet_out, RECEIVERNODEID, USEACK))
         {
             Serial.printf("%f\n", radio->GetLastResponsePacket().battery_voltage);
