@@ -50,8 +50,9 @@ void TransmitterHandler::update()
     if(gTimer.DeltaTimeMillis(&last_time, 5))
     {
 
-        if(controller->update())
-            return;
+        //if(controller->update())
+        //    return;
+        controller->update();
 
 
         //ready the packet

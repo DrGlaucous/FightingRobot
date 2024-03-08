@@ -25,9 +25,22 @@
 
 // Addresses for this node. CHANGE THESE FOR EACH NODE!
 
+#define SENDER
+
+
 #define NETWORKID 0 // Must be the same for all nodes
+
+#define SENDER_ID 1
+#define REC_ID 2
+
+#ifdef SENDER
 #define MYNODEID 1	// My node ID
 #define TONODEID 2	// Destination node ID
+#else
+#define MYNODEID 2	// My node ID
+#define TONODEID 1	// Destination node ID
+#endif
+
 
 // RFM69 frequency, uncomment the frequency of your module:
 
@@ -83,16 +96,16 @@ void setupFunc()
 
 	// alt settings for ESP32
 	//SPI.begin(SCK, MISO, MOSI, SS);
+#ifdef USING_ESP32
 	SPI.begin(26, 25, 33, 32);
 	radio = new RFM69(32, 35, true, &SPI);
+#elif USING_STM32
 
-	// alt settings for STM32
-	//SPIClass* thisspi = new SPIClass(); //SPIClass(PA7, PA6, PA5, PA4);
-	//SPI.setMOSI(PB5);
-
-	//radio = new RFM69(PA4, PA10, true, &SPI);
-	//radio->setCS(PA4);
-    //radio->setIrq(PB4);
+	// alt settings for the STM32
+	radio = new RFM69(PA4, PA10, true, &SPI);
+	radio->setCS(PA4);
+    radio->setIrq(PB4);
+#endif
 
 	// // Set up the indicator LED (optional):
 
@@ -107,6 +120,9 @@ void setupFunc()
 
 	// radio.spyMode(true);
 	// radio.setIsrCallback(&HandleA);
+
+
+
 	radio->initialize(FREQUENCY, MYNODEID, NETWORKID);
 	radio->setHighPower(); // Always use this for RFM69HCW
 

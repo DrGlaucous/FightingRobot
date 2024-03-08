@@ -15,7 +15,7 @@ unsigned long LastMicrosecondTicks{};
 //Initialize a PPMReader on digital pin 3 with 6 expected channels.
 
 #ifdef USING_STM32
-#define IRQ_PIN PA0
+#define IRQ_PIN PB11 //PA0 for LB
 #elif USING_ARDUINO
 //non-analog pins can be delcared using digits in arduino
 #define IRQ_PIN 2
