@@ -11,7 +11,6 @@
 #ifdef IS_CONTROLLER
 
 
-
 TransmitterHandler::TransmitterHandler()
 {
 #ifdef USING_ESP32
@@ -50,9 +49,11 @@ void TransmitterHandler::update()
     if(gTimer.DeltaTimeMillis(&last_time, 5))
     {
 
-        //if(controller->update())
-        //    return;
-        controller->update();
+        if(controller->update())
+           return;
+        
+        //test: ignore null PPM
+        //controller->update();
 
 
         //ready the packet
@@ -60,7 +61,7 @@ void TransmitterHandler::update()
         packet_out.channels = controller->GetReadyPacket();
 
 
-        // test: check for error values (we seem to be getting those)
+        // test: check for error values (we seem to be getting OOB vals on channel 3...)
         // packet_out.channels.analog_channels[3] = 255;
         // bool wrongful = false;
         // for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
@@ -75,11 +76,17 @@ void TransmitterHandler::update()
         //     Serial.printf("\n");
 
 
-        //if transmit success, print the bounceback packet
+        // if transmit success, print the bounceback packet
         if(!radio->SendPacket(packet_out, RECEIVERNODEID, USEACK))
         {
-            Serial.printf("%f\n", radio->GetLastResponsePacket().battery_voltage);
+            //sprinf(%f) is not supported with the current STM32 backend... cast to int
+            float num = radio->GetLastResponsePacket().battery_voltage;
+            u_int32_t decimal_ten = 1000; //3 decimals
+            Serial.printf( "%d.%d\n", (int)num, (int)(num * 1000) % 1000);
         }
+
+
+
     }
 }
 
