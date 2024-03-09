@@ -9,8 +9,6 @@
 #ifdef USING_ESP32
 #include <ESP32Servo.h>
 #include <DShotRMT.h>
-#elif USING_STM32_BP
-//#include <STM32_ISR_Servo.h>
 #endif
 
 
@@ -320,8 +318,6 @@ class RobotHandler
     DShotRMT* esc;
     Servo* servo_1;
     Servo* servo_2;
-#elif USING_STM32_BP
-    //todo: servos
 #endif
 
 

@@ -15,17 +15,8 @@
 #define FREQUENCY     RF69_915MHZ
 #define IS_HIGH_POWER true
 
-//pins for the radio
-#ifdef USING_STM32_BP
-    //final setup
-    #define SLAVE_PIN PA4
-    #define IRQ_PIN PC14
-
-    //testing setup (littleBuddies)
-    //#define SLAVE_PIN PA4
-    //#define IRQ_PIN PB4
-
-#elif USING_ESP32
+//pins for the radio (depricated as of switching to ESP-now)
+#ifdef USING_ESP32
     #define SLAVE_PIN 32
     #define IRQ_PIN 35
 
@@ -46,7 +37,7 @@
 
 ////////BEHAVIOR SETTINGS////////
 
-//what end of the stick the firmware is on (moved to INI)
+//what end of the stick the firmware is on
 //#define IS_CONTROLLER
 
 
@@ -87,10 +78,8 @@
     //trigger on falling edge instead of rising edge (for futaba's weird 12 channel format)
     #define PPM_IS_INVERTED true
 
-#ifdef USING_STM32_BP
-    #define PPM_INTURRUPT_PIN PB11
-#elif USING_ESP32
-    #define PPM_INTURRUPT_PIN 27
+#ifdef USING_ESP32
+    #define PPM_INTURRUPT_PIN 16
 #endif
     #define PPM_CHANNEL_COUNT CHANNEL_COUNT
     #define PPM_BLANK_TIME 5000
@@ -122,28 +111,8 @@
     //HI-LO is dir 1
     //LO-HI is dir 2
 
-#ifdef USING_STM32_BP
-    //DRIVEBASE PINS
-    #define MOTOR_1A_PIN PB0
-    #define MOTOR_1B_PIN PB0
 
-    #define MOTOR_2A_PIN PB0
-    #define MOTOR_2B_PIN PB0
-
-    #define MOTOR_3A_PIN PB0
-    #define MOTOR_3B_PIN PB0
-
-    #define MOTOR_SLEEP_PIN PB0
-
-    #define VOLTMETER_PIN PB0
-
-
-    //WEAPON PINS
-    #define SERVO_1_PIN PB14
-    #define SERVO_2_PIN PB15
-    #define ESC_PIN PA8
-
-#elif USING_ESP32
+#ifdef USING_ESP32
     //DRIVEBASE PINS
 
     //is 1, should be 3
@@ -201,13 +170,7 @@
     //number of magnets in the motor (for erpm measurements, only used in dshot mode)
     #define MOTOR_POLE_COUNT 14
 
-#ifdef USING_STM32_BP
-    //PWM speeds
-    #define ESC_SPEED_MIDDLE 0 //'0' in 3D mode
-    //full speed in 3D mode
-    #define ESC_SPEED_MIN 0
-    #define ESC_SPEED_MAX 180
-#elif USING_ESP32
+#ifdef USING_ESP32
     //dshot speeds (better than PWM, but only works with the dshot library)
     #define ESC_SPEED_MIDDLE 1024 //'0' in 3D mode
     //full speed in 3D mode

@@ -3,8 +3,6 @@
 #ifdef USING_ESP32
 #include <ESP32Servo.h>
 #include <DShotRMT.h>
-#elif USING_STM32_BP
-#include <STM32_ISR_Servo.h>
 #endif
 
 #include "Controller.h"
@@ -38,10 +36,6 @@ RobotHandler::RobotHandler()
     //set up SPI matrix on ESP32 (can use non-default pins)
     SPI.begin(SPI_SCK_PIN, SPI_MISO_PIN, SPI_MOSI_PIN, SPI_NSS_PIN);
 
-#elif USING_STM32_BP
-    //todo: add this
-
-    //stm32 has weird problems when specifying non-default SPI pins
 #endif
 
 
@@ -302,8 +296,6 @@ void RobotHandler::WriteMotors()
         //esc->send_dshot_value(esc_speed);
         //auto error_t = esc->get_dshot_packet(&esc_speed);
     }
-#elif USING_STM32_BP
-    //todo: add this
 #endif
 
 
