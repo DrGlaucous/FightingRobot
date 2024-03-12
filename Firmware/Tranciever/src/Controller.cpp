@@ -25,7 +25,6 @@ ControllerHandler::~ControllerHandler()
     delete(ppm);
 }
 
-
 bool ControllerHandler::update()
 {
     //get PPM from remote
@@ -208,7 +207,7 @@ void ControllerHandler::PrintRawChannels(uint16_t* channel_array, uint16_t array
     for (byte channel = 1; channel <= array_len; ++channel)
     {
         //test: report back serial values
-        Serial.printf("%d, \t", channel_array[channel - 1]);
+        Serial.printf("%d\t", channel_array[channel - 1]);
     }
     //test
     Serial.println();
@@ -225,7 +224,6 @@ void ControllerHandler::PrintProcessedChannels()
         Serial.printf("Digital %d: SW 1: %d SW 2: %d\n", i, digital_channels[i].switch_main, digital_channels[i].switch_second);
     }
 }
-
 
 
 

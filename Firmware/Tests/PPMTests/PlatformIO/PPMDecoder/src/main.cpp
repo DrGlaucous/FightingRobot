@@ -20,13 +20,28 @@ unsigned long LastMicrosecondTicks{};
 //non-analog pins can be delcared using digits in arduino
 #define IRQ_PIN 2
 #else
-#define IRQ_PIN -1
+#define IRQ_PIN 16
+
+#define PPM_INTURRUPT_PIN 16
+#define PPM_CHANNEL_COUNT CHANNEL_COUNT
+#define PPM_BLANK_TIME 5000
+#define PPM_MAX_WAIT_VALUE 1100
+#define PPM_MIN_WAIT_VALUE 400
+
+//how many analog channels we have
+#define ANALOG_CHANNEL_CNT 8
+//how many grouped digital channels we have (2 digital inputs per channel, due to how futaba remotes work)
+#define DIGITAL_CHANNEL_CNT 4
+#define CHANNEL_COUNT ANALOG_CHANNEL_CNT + DIGITAL_CHANNEL_CNT
+#define PPM_IS_INVERTED true
+
+
 #endif
 
 uint32_t interruptPin = IRQ_PIN;
 
 byte channelAmount = 12;
-PPMReader ppm(interruptPin, channelAmount, 1);
+PPMReader* ppm;//(interruptPin, channelAmount, 1);
 
 
 //for STM32 boards, Serial is Serial1
@@ -53,9 +68,17 @@ void setup() {
     pinMode(LED_BUILTIN, OUTPUT);
     Serial.begin(115200);
 
-    ppm.blankTime = 5000;//10000;
-    ppm.maxChannelValue = 1100;
-    ppm.minChannelValue = 400;
+
+    ppm = new PPMReader(PPM_INTURRUPT_PIN, CHANNEL_COUNT, PPM_IS_INVERTED);
+
+    //setup PPM values for 12 channel mode
+    ppm->blankTime = PPM_BLANK_TIME;//10000;
+    ppm->maxChannelValue = PPM_MAX_WAIT_VALUE;
+    ppm->minChannelValue = PPM_MIN_WAIT_VALUE;
+
+    //ppm.blankTime = 5000;//10000;
+    //ppm.maxChannelValue = 1100;
+    //ppm.minChannelValue = 400;
 
 }
 
@@ -79,14 +102,14 @@ void loop() {
 
     // Print latest valid values from all channels
     for (byte channel = 1; channel <= channelAmount; ++channel) {
-        unsigned value = ppm.latestValidChannelValue(channel, 0);
+        unsigned value = ppm->latestValidChannelValue(channel, 0);
         //unsigned value = ppm.rawChannelValue(channel);
 
         Serial.print(value);
         if(channel < channelAmount) Serial.print('\t');
     }
     Serial.println();
-    delay(20);
+    delay(5);
 
 
 
