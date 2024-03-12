@@ -7,7 +7,7 @@
 
 
 #include "configuration.h"
-#include "Radio.h"
+#include "ESPRadio.h"
 #include "Controller.h"
 
 
@@ -29,7 +29,7 @@ class TransmitterHandler
     //for timing transmissions
     unsigned long last_time = 0;
 
-    RadioHandler* radio;
+    RadioNowHandler* radio;
     ControllerHandler* controller;
 
 

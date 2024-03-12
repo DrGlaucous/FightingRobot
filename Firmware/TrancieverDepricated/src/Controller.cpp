@@ -56,9 +56,8 @@ bool ControllerHandler::update()
     {
         ParseSwitchSums(p_channels[ANALOG_CHANNEL_CNT + i], &digital_channels[i]);
     }
-    //test
-    //PrintProcessedChannels();
 
+    //PrintProcessedChannels();
     return has_err;
 
 }

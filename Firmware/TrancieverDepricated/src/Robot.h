@@ -2,7 +2,7 @@
 #include <Arduino.h>
 
 #include "Controller.h"
-#include "Radio.h"
+#include "ESPRadio.h"
 #include "configuration.h"
 #include "TimerTick.h"
 
@@ -308,7 +308,7 @@ class RobotHandler
     //used to update the ESC output (only in dshot mode)
     unsigned long last_esc_time = 0;
 
-    RadioHandler* radio;
+    RadioNowHandler* radio;
     BlinkerHandler* blinker;
     FastTrig* mr_trig;
 

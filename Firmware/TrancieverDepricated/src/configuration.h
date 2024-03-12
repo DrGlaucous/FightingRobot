@@ -4,19 +4,39 @@
 
 ////////RADIO SETTINGS////////
 
+// Addresses for this node. CHANGE THESE FOR EACH NODE!
+#define RECEIVERNODEID      1   //node the transmitter lives on
+#define TRANSMITTERNODEID   2   //node the robot lives on
+
 //espnow
-#define NETWORKID           4   // Must be the same for all nodes
+#define NETWORKID           0   // Must be the same for all nodes
 //custom MAC addresses
 #define SENDER_ADDR {0x30, 0xAE, 0xA4, 0x07, 0x0D, 0x64}
 #define REC_ADDR {0xA0, 0x0E, 0x04, 0x0F, 0xFD, 0x64}
+#define N_ENCRYPTKEY {0xA0,0xA0,0xFF,0x00,0xFF,0xA0,0xA0,0xA0,0xFF,0x45,0xA0,0xA0,0x26,0x20,0x43,0xA0}
 
 //#define FREQUENCY   RF69_433MHZ
 #define FREQUENCY     RF69_915MHZ
 #define IS_HIGH_POWER true
 
-#define ENCRYPT       true // Set to "true" to use encryption
-#define ENCRYPTKEY_S {0xA0,0xA0,0xFF,0x00,0xFF,0xA0,0xA0,0xA0,0xFF,0x45,0xA0,0xA0,0x26,0x20,0x43,0xA0}
-#define ENCRYPTKEY_P    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
+//pins for the radio (depricated as of switching to ESP-now)
+#ifdef USING_ESP32
+    #define SLAVE_PIN 32
+    #define IRQ_PIN 35
+
+    #define SPI_SCK_PIN 26
+    #define SPI_MISO_PIN 25
+    #define SPI_MOSI_PIN 33
+    #define SPI_NSS_PIN SLAVE_PIN
+#endif
+
+
+
+#define ENCRYPT       false // Set to "true" to use encryption
+#define ENCRYPTKEY    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
+
+// Use ACKnowledge when sending messages (or not):
+#define USEACK        true // Request ACKs or not
 
 
 ////////BEHAVIOR SETTINGS////////
@@ -62,8 +82,9 @@
     //trigger on falling edge instead of rising edge (for futaba's weird 12 channel format)
     #define PPM_IS_INVERTED true
 
-
+#ifdef USING_ESP32
     #define PPM_INTURRUPT_PIN 16
+#endif
     #define PPM_CHANNEL_COUNT CHANNEL_COUNT
     #define PPM_BLANK_TIME 5000
     #define PPM_MAX_WAIT_VALUE 1100
@@ -95,6 +116,7 @@
     //LO-HI is dir 2
 
 
+#ifdef USING_ESP32
     //DRIVEBASE PINS
 
     //is 1, should be 3
@@ -122,43 +144,48 @@
 
 #endif
 
-//control surface mapping
+    //control surface mapping
+    
+    //analog
+    #define X_IN 0
+    #define Y_IN 1
+    #define TURN_IN 3
+    #define SERVO_IN 2
+    #define ESC_IN 4
+    #define SERVO_MIN_IN 7
+    #define SERVO_MAX_IN 8
+    
+    //digital
+    #define FLIPOVER_IN 0
+    #define ESC_REVERSE_IN 1
+    #define TWO_MODE_IN 2
+    #define TWO_SELECT_IN 3
 
-//analog
-#define X_IN 0
-#define Y_IN 1
-#define TURN_IN 3
-#define SERVO_IN 2
-#define ESC_IN 4
-#define SERVO_MIN_IN 7
-#define SERVO_MAX_IN 8
+    //normalization
 
-//digital
-#define FLIPOVER_IN 0
-#define ESC_REVERSE_IN 1
-#define TWO_MODE_IN 2
-#define TWO_SELECT_IN 3
+    //analog pins go from 0-255, so this must be within that range
+    #define XY_RADIUS 0xFF
 
-//normalization
+    #define SERVO_MIN 0
+    #define SERVO_MAX 180
+    //range of motion on one side (depricated in favor of making this adjustable using the knobs on the remote)
+    //#define SERVO_RANGE 100
 
-//analog pins go from 0-255, so this must be within that range
-#define XY_RADIUS 0xFF
+    //number of magnets in the motor (for erpm measurements, only used in dshot mode)
+    #define MOTOR_POLE_COUNT 14
 
-#define SERVO_MIN 0
-#define SERVO_MAX 180
-//range of motion on one side (depricated in favor of making this adjustable using the knobs on the remote)
-//#define SERVO_RANGE 100
-
-//number of magnets in the motor (for erpm measurements, only used in dshot mode)
-#define MOTOR_POLE_COUNT 14
+#ifdef USING_ESP32
+    //dshot speeds (better than PWM, but only works with the dshot library)
+    #define ESC_SPEED_MIDDLE 1024 //'0' in 3D mode
+    //full speed in 3D mode
+    #define ESC_SPEED_MIN 48
+    #define ESC_SPEED_MAX 2048
+#endif
 
 
 
-//dshot speeds (better than PWM, but only works with the dshot library)
-#define ESC_SPEED_MIDDLE 1024 //'0' in 3D mode
-//full speed in 3D mode
-#define ESC_SPEED_MIN 48
-#define ESC_SPEED_MAX 2048
 
 
+
+#endif
 

@@ -6,7 +6,7 @@
 #endif
 
 #include "Controller.h"
-#include "Radio.h"
+#include "ESPRadio.h"
 #include "configuration.h"
 #include "Robot.h"
 
@@ -33,25 +33,10 @@ RobotHandler::RobotHandler()
     //servo_1->attach(SERVO_1_PIN);
     //servo_2->attach(SERVO_2_PIN);
 
-    //set up SPI matrix on ESP32 (can use non-default pins)
-    SPI.begin(SPI_SCK_PIN, SPI_MISO_PIN, SPI_MOSI_PIN, SPI_NSS_PIN);
-
 #endif
 
 
-    auto startup_settings = radio_handler_config_datapack_t
-    {
-        SLAVE_PIN,
-        IRQ_PIN,
-        FREQUENCY,
-        RECEIVERNODEID,
-        NETWORKID,
-        IS_HIGH_POWER,
-        ENCRYPT,
-        ENCRYPTKEY,
-        &SPI,
-    };
-    radio = new RadioHandler(startup_settings);
+    radio = new RadioNowHandler();
     blinker = new BlinkerHandler(LED_BUILTIN);
     mr_trig = new FastTrig();
 
@@ -104,7 +89,7 @@ void RobotHandler::update()
     ackpt.battery_voltage = battery_voltage;
 
     //sniff for packets (and send ack if we got any)
-    response_status_t responsee = radio->CheckForResponse(NULL, ackpt);
+    bool responsee = radio->CheckForPacket(NULL);
     //perform action based on response type
     //if(responsee == RX_SENT_ACK || responsee == RX_SUCCESS)
     //    DumpChannelPacket();
@@ -160,12 +145,12 @@ void RobotHandler::DumpChannelPacket()
     //dump recieved channels
     for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
     {
-        Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.analog_channels[i]);
+        //Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.analog_channels[i]);
     }
     Serial.printf("|//|");
     for(int i = 0; i < DIGITAL_CHANNEL_CNT * 2; ++i)
     {
-        Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.digital_channels[i]);
+        //Serial.printf("%d : %d||", i, radio->GetLastControlPacket().channels.digital_channels[i]);
     }
     Serial.printf("\n");
 }
@@ -173,9 +158,8 @@ void RobotHandler::DumpChannelPacket()
 
 void RobotHandler::MapControllerData()
 {
-    auto gotten_data = radio->GetLastControlPacket().channels;
-
-
+    auto gotten_data = remote_control_packet_t{}.channels;//radio->GetLastControlPacket().channels;
+    
     if(gotten_data.analog_channels[TURN_IN] > 300 || gotten_data.analog_channels[TURN_IN] < 240)
     {
         Serial.println(gotten_data.analog_channels[TURN_IN]);

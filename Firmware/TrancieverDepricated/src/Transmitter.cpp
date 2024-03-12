@@ -3,37 +3,18 @@
 
 
 #include "configuration.h"
-#include "Radio.h"
 #include "Controller.h"
 #include "TimerTick.h"
 #include "Transmitter.h"
+#include "ESPRadio.h"
 
 #ifdef IS_CONTROLLER
 
 
 TransmitterHandler::TransmitterHandler()
 {
-#ifdef USING_ESP32
-    //set up SPI matrix on ESP32 (can use non-default pins)
-    SPI.begin(SPI_SCK_PIN, SPI_MISO_PIN, SPI_MOSI_PIN, SPI_NSS_PIN);
-#endif
-
-    auto startup_settings = radio_handler_config_datapack_t
-    {
-        SLAVE_PIN,
-        IRQ_PIN,
-        FREQUENCY,
-        TRANSMITTERNODEID,
-        NETWORKID,
-        IS_HIGH_POWER,
-        ENCRYPT,
-        ENCRYPTKEY,
-        &SPI,
-    };
-    radio = new RadioHandler(startup_settings);
-
+    radio = new RadioNowHandler();
     controller = new ControllerHandler();
-
 }
 
 TransmitterHandler::~TransmitterHandler()
@@ -49,8 +30,8 @@ void TransmitterHandler::update()
     if(gTimer.DeltaTimeMillis(&last_time, 5))
     {
 
-        if(controller->update())
-           return;
+        //if(controller->update())
+        //   return;
         
         //test: ignore null PPM
         //controller->update();
@@ -76,13 +57,15 @@ void TransmitterHandler::update()
         //     Serial.printf("\n");
 
 
+
         // if transmit success, print the bounceback packet
-        if(!radio->SendPacket(packet_out, RECEIVERNODEID, USEACK))
+        if(radio->SendPacket(packet_out) == TX_SUCCESS)
         {
             //sprinf(%f) is not supported with the current STM32 backend... cast to int
-            float num = radio->GetLastResponsePacket().battery_voltage;
-            u_int32_t decimal_ten = 1000; //3 decimals
-            Serial.printf( "%d.%d\n", (int)num, (int)(num * 1000) % 1000);
+            // float num = radio->GetLastResponsePacket().battery_voltage;
+            // u_int32_t decimal_ten = 1000; //3 decimals
+            // Serial.printf( "%d.%d\n", (int)num, (int)(num * 1000) % 1000);
+            //Serial.printf("Sent Success\n");
         }
 
 

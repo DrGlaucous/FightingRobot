@@ -63,4 +63,5 @@ private:
 };
 
 
+extern TimerHandler gTimer; 
 

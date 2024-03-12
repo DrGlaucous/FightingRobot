@@ -17,8 +17,6 @@ typedef enum packet_type_e
     PACKET_NULL = 0x00,
     PACKET_CONTROL_VALUES = 0x01,
     PACKET_RESPONSE_VALUES = 0x02,
-    PACKET_INTEGER = 0x03,
-    PACKET_ARRAY = 0x04,
 }packet_type_t;
 
 
@@ -39,6 +37,8 @@ typedef enum tx_status_e
 #pragma pack(1) //force compiler to compact the struct
 typedef struct remote_control_packet_s
 {
+    uint8_t packettype = PACKET_CONTROL_VALUES;
+
     concatated_channels_t channels = {};
 }remote_control_packet_t;
 
@@ -48,10 +48,19 @@ typedef struct remote_control_packet_s
 #pragma pack(1) 
 typedef struct remote_ack_packet_s
 {
+    packet_type_t packettype = PACKET_RESPONSE_VALUES;
     uint32_t motor_rpm = 0;
     float_t battery_voltage = 0.0;
 
 }remote_ack_packet_t;
+
+//all the settings for configuring the radio
+typedef struct radio_n_handler_config_datapack_s
+{
+    uint8_t channel; //operation channel
+    bool should_encrypt; //should encrypt
+
+}radio_n_handler_config_datapack_t;
 
 class RadioNowHandler
 {
@@ -59,29 +68,16 @@ class RadioNowHandler
     RadioNowHandler();
     ~RadioNowHandler();
 
-    //todo: inline these
-    tx_status_t SendPacket(unsigned int data);
-    tx_status_t SendPacket(remote_control_packet_t data);
-    tx_status_t SendPacket(remote_ack_packet_t data);
-    tx_status_t SendPacket(void* data, uint32_t size);
+    tx_status_t SendPacket(remote_control_packet_t packet);
+    rx_status_t CompilePacket();
 
-    remote_control_packet_t GetLastControlPacket();
-    remote_ack_packet_t GetLastAckPacket();
-    uint64_t GetDeltaTime();
-
-    rx_status_t CheckForPacket(packet_type_t* last_got);
+    bool CheckForPacket(packet_type_t* last_got);
 
     private:
-
-    tx_status_t SendPacket(void* data, uint32_t size, packet_type_t type);
-    
-    uint64_t delta_time = {};
 
     uint8_t raw_queue_dump[ESP_NOW_MAX_DATA_LEN] = {};
     remote_control_packet_t last_control_packet = {};
     remote_ack_packet_t lask_ack_packet = {};
-
-
 
 };
 
