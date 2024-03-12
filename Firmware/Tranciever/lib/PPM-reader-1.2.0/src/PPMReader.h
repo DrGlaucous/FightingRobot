@@ -50,6 +50,9 @@ class PPMReader {
     // The number of channels to be expected in the PPM signal
     byte channelAmount = 0;
 
+    //remeber this startup setting, used to resume ISRs after temp suspense
+    byte isrFalls;
+
     // Arrays for keeping track of channel values
 
     //holds stuff gathered from the ISR (not guaranteed to be complete)
@@ -57,6 +60,9 @@ class PPMReader {
     //holds only the latest complete packet of values
     volatile unsigned *rawValues = NULL;
 
+    //true if the reader has gotten at least one full packet since the last inturrupt disable
+    volatile bool fullPacket = false;
+    
 
     // A counter variable for determining which channel is being read next
     volatile byte pulseCounter = 0;
@@ -79,6 +85,13 @@ class PPMReader {
     // Returns defaultValue if the channel hasn't received any valid values yet, or the PPM signal was absent for more than failsafeTimeout
     unsigned latestValidChannelValue(byte channel, unsigned defaultValue);
 
+    bool hasFullPacket(void);
+    
+    //detaches inturrupt pin
+    void suspendInturrupt(void);
+    //re-attaches inturrupt pin, resetting pulseCounter and the full packet flag
+    void resumeInturrupt(void);
+
     private:
 
     // An interrupt service routine for handling the interrupts activated by PPM pulses
@@ -86,6 +99,7 @@ class PPMReader {
 
     // Interrupt service routine function compatible with attachInterrupt. Add more funcitons if multiple PPM reader instances are needed
     static void PPM_ISR(void);
+
 
 };
 

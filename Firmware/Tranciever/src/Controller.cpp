@@ -25,22 +25,27 @@ ControllerHandler::~ControllerHandler()
     delete(ppm);
 }
 
-bool ControllerHandler::update()
+controller_poll_result_t ControllerHandler::update()
 {
+
+    //check that there is a full packet avalable
+    if(!ppm->hasFullPacket())
+        return ERR_NO_FRESH_PACKET;
+
+
     //get PPM from remote
     GetControlSurface(p_channels, PPM_CHANNEL_COUNT);
     
 
     //check if values are OOB (report error if so, this usually means the transmitter is being turned on)
-    bool has_err = false;
+    controller_poll_result_t has_err = UPDATE_GOOD;
     for(int i = 0; i < PPM_CHANNEL_COUNT; ++i)
     {
         if(p_channels[i] < PPM_MIN_WAIT_VALUE || p_channels[i] > PPM_MAX_WAIT_VALUE)
         {
-            has_err = true;
+            has_err = ERR_PPM_OUT_OF_RANGE;
         }
     }
-
 
     //test
     PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
@@ -55,6 +60,7 @@ bool ControllerHandler::update()
     {
         ParseSwitchSums(p_channels[ANALOG_CHANNEL_CNT + i], &digital_channels[i]);
     }
+    
     //test
     //PrintProcessedChannels();
 
@@ -226,6 +232,13 @@ void ControllerHandler::PrintProcessedChannels()
 }
 
 
-
+void ControllerHandler::DisablePPM()
+{
+    ppm->suspendInturrupt();
+}
+void ControllerHandler::EnablePPM()
+{
+    ppm->resumeInturrupt();
+}
 
 #endif

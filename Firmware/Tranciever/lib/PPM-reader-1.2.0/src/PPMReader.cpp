@@ -46,8 +46,8 @@ PPMReader::PPMReader(byte interruptPin, byte channelAmount, byte isFalling):
     if(ppm == NULL) {
         ppm = this;
 
-
-    if(isFalling) //weird Futaba 12 channel protocol
+    isrFalls = isFalling;
+    if(isrFalls) //weird Futaba 12 channel protocol
         attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, FALLING);
     else
         attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, RISING);
@@ -81,6 +81,8 @@ void PPMReader::handleInterrupt(void) {
             //unsafe to use memcpy on volatiles; do it manually
             for(int i = 0; i < channelAmount; ++i)
                 rawValues[i] = partialValues[i];
+            //OK to read packet; we have a full one.
+            fullPacket = true;
         }
 
         // Blank detected: restart from channel 1 
@@ -123,4 +125,28 @@ unsigned PPMReader::latestValidChannelValue(byte channel, unsigned defaultValue)
         else value = defaultValue;
     }
     return value;
+}
+
+bool PPMReader::hasFullPacket()
+{
+    bool hasPack;
+	noInterrupts();
+	hasPack = fullPacket;
+	interrupts();
+    return hasPack;
+}
+void PPMReader::suspendInturrupt()
+{
+    detachInterrupt(digitalPinToInterrupt(interruptPin));
+}
+void PPMReader::resumeInturrupt()
+{
+    //reset counters
+    fullPacket = false;
+    pulseCounter = 0;
+
+    if(isrFalls) //weird Futaba 12 channel protocol
+        attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, FALLING);
+    else
+        attachInterrupt(digitalPinToInterrupt(interruptPin), PPM_ISR, RISING);
 }

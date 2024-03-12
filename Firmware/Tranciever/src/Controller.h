@@ -95,6 +95,15 @@ typedef struct concatated_channels_s
 }concatated_channels_t;
 
 #ifdef IS_CONTROLLER
+
+typedef enum controller_poll_result_e
+{
+    UPDATE_GOOD,
+    ERR_PPM_OUT_OF_RANGE, //happens when the controller is off
+    ERR_NO_FRESH_PACKET, //happens when the controller hasn't had a chance to get the most recent packets
+} controller_poll_result_t;
+
+
 class ControllerHandler
 {
 
@@ -103,7 +112,7 @@ class ControllerHandler
     ~ControllerHandler();
 
     //runs both the PPM getter and the normalizer for any new inputs
-    bool update();
+    controller_poll_result_t update();
 
 
     //using the initial config, normalizes an array of PPM values
@@ -115,6 +124,8 @@ class ControllerHandler
     //combines all channel values into a struct for transmission
     concatated_channels_t GetReadyPacket();
 
+    void DisablePPM();
+    void EnablePPM();
 
     private:
 
@@ -142,7 +153,6 @@ class ControllerHandler
     //test
     void PrintRawChannels(uint16_t* channel_array, uint16_t array_len);
     void PrintProcessedChannels();
-
 
 
 
