@@ -21,7 +21,7 @@ public:
 
     }
 
-    //true if changed
+    //true if changed: relies on update()
     inline bool MillisChanged()
     {
         return LastMillisecondTicks != MillisecondTicks;
@@ -31,14 +31,15 @@ public:
         return LastMicrosecondTicks != MicrosecondTicks;
     }
 
+
     //true if time >= last time
-    inline bool DeltaTimeMillis(unsigned long* last_time, unsigned long elapse_time)
+    static inline bool DeltaTimeMillis(unsigned long* last_time, unsigned long elapse_time)
     {
-        return DeltaTimeUnit(last_time, elapse_time, MillisecondTicks);
+        return DeltaTimeUnit(last_time, elapse_time, millis());
     }
-    inline bool DeltaTimeMicros(unsigned long* last_time, unsigned long elapse_time)
+    static inline bool DeltaTimeMicros(unsigned long* last_time, unsigned long elapse_time)
     {
-        return DeltaTimeUnit(last_time, elapse_time, MicrosecondTicks);
+        return DeltaTimeUnit(last_time, elapse_time, micros());
     }
 
 
@@ -50,7 +51,7 @@ private:
     unsigned long LastMillisecondTicks{};//previous values
     unsigned long LastMicrosecondTicks{};
 
-    bool DeltaTimeUnit(unsigned long* last_time, unsigned long elapse_time, unsigned long counter)
+    static bool DeltaTimeUnit(unsigned long* last_time, unsigned long elapse_time, unsigned long counter)
     {
         if(*last_time + elapse_time <= counter)
         {
