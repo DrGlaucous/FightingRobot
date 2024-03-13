@@ -40,6 +40,8 @@ for edge walls, 3-5mm will suffice (put curves so the robot cannot sit on them)
 
 
 
+Controller template was gotten from here:
+https://www.dronevibes.com/forums/threads/futaba-t14sg-radio-controller-function-map-pdf.24361/
 
 
 Futaba 12 channel troubles:

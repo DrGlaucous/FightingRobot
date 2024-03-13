@@ -91,7 +91,7 @@ void RobotHandler::update()
     {
         //take rx packets and format them for each application
         MapControllerData();
-        DumpChannelPacket();
+
     }
 
     //send back information about the robot on regular intervals
@@ -102,6 +102,8 @@ void RobotHandler::update()
     
     //analogWrite to each motor driver
     WriteMotors();
+
+    DumpChannelPacket();
 
 
 
@@ -151,6 +153,14 @@ void RobotHandler::DumpChannelPacket()
     Serial.printf("\n");
 }
 
+void RobotHandler::DumpMappedPacket()
+{
+    //dump recieved channels
+    //Serial.printf("XM: %5d YM: %5d ROT: %5d\n", xm, ym, rot_m);
+    //Serial.printf("M1: %5d M2: %5d M3: %5d\n", mot1, mot2, mot3);
+
+}
+
 
 void RobotHandler::MapControllerData()
 {
@@ -169,10 +179,10 @@ void RobotHandler::MapControllerData()
     rot_m = map(gotten_data.analog_channels[TURN_IN], NORMAL_MIN, NORMAL_MAX, -XY_RADIUS, XY_RADIUS);
 
 
-    is_flipped_over = gotten_data.analog_channels[FLIPOVER_IN] < 1;
-    is_two_wheeled = gotten_data.analog_channels[TWO_MODE_IN] < 1;
-    broken_wheel = gotten_data.analog_channels[TWO_SELECT_IN];
-    esc_reversed = gotten_data.analog_channels[ESC_REVERSE_IN];
+    is_flipped_over = gotten_data.digital_channels[FLIPOVER_IN] < 1;
+    is_two_wheeled = gotten_data.digital_channels[TWO_MODE_IN] < 1;
+    broken_wheel = gotten_data.digital_channels[TWO_SELECT_IN];
+    esc_reversed = gotten_data.digital_channels[ESC_REVERSE_IN];
 
     //from the knobs, controls how far the servo arm will rotoate with the stick
     servo_angle_min = map(gotten_data.analog_channels[SERVO_MIN_IN], NORMAL_MIN, NORMAL_MAX, SERVO_MIN, SERVO_MAX);
@@ -263,20 +273,21 @@ void RobotHandler::WriteMotors()
 
 
 
-    //write ESC
-#ifdef USING_ESP32
+
 
     //write servos (using degrees)
     auto mirrored_servo_angle = servo_angle_max == servo_angle_min ? servo_angle_min : map(servo_angle, servo_angle_min, servo_angle_max, servo_angle_max, servo_angle_min);
     servo_1->write(is_flipped_over? mirrored_servo_angle : servo_angle);
     servo_2->write(is_flipped_over? servo_angle : mirrored_servo_angle);
 
+    //Serial.printf("S1: %5d S2: %5d\n", servo_angle, mirrored_servo_angle);
+
+    //write ESC
     if(TimerHandler::DeltaTimeMillis(&last_esc_time, 2))
     {
-        //esc->send_dshot_value(esc_speed);
-        //auto error_t = esc->get_dshot_packet(&esc_speed);
+        esc->send_dshot_value(esc_speed);
+        auto error_t = esc->get_dshot_packet(&esc_speed);
     }
-#endif
 
 
 }

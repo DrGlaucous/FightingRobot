@@ -360,6 +360,8 @@ class RobotHandler
 
     //test: dump channels to serial monitor
     void DumpChannelPacket();
+    //dump processed cahnnels to serial moditor
+    void DumpMappedPacket();
 
 
 };

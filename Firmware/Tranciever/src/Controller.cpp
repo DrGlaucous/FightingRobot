@@ -48,7 +48,7 @@ controller_poll_result_t ControllerHandler::update()
     }
 
     //test
-    PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
+    //PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
 
     //normalize data for analog channels
     for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
@@ -62,7 +62,7 @@ controller_poll_result_t ControllerHandler::update()
     }
     
     //test
-    //PrintProcessedChannels();
+    PrintProcessedChannels();
 
     return has_err;
 

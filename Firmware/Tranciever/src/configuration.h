@@ -22,7 +22,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-#define IS_CONTROLLER
+//#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////
@@ -113,9 +113,10 @@
 
 
     //WEAPON PINS
+
     #define SERVO_1_PIN 2
-    #define SERVO_2_PIN 0
-    #define ESC_PIN 4
+    #define SERVO_2_PIN 4
+    #define ESC_PIN 0
 
     //OTHER
     #define VOLTMETER_PIN 34
@@ -130,8 +131,8 @@
 #define TURN_IN 3
 #define SERVO_IN 2
 #define ESC_IN 4
-#define SERVO_MIN_IN 7
-#define SERVO_MAX_IN 8
+#define SERVO_MIN_IN 6
+#define SERVO_MAX_IN 7
 
 //digital
 #define FLIPOVER_IN 0
