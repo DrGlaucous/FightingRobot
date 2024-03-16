@@ -9,7 +9,7 @@
 #include "TimerTick.h"
 #include "Transmitter.h"
 #include "Robot.h"
-
+#include "PPMRMT.h"
 
 //custom MAC addresses
 uint8_t sender_addr[] = {0x30, 0xAE, 0xA4, 0x07, 0x0D, 0x64};
@@ -24,7 +24,7 @@ TransmitterHandler* transmitter;
 RobotHandler* robot;
 #endif
 
-
+//PPMRMT* ppm_get;
 
 void setup()
 {
@@ -36,6 +36,7 @@ void setup()
     robot = new RobotHandler();
 #endif
 
+    //ppm_get = new PPMRMT(PPM_INTURRUPT_PIN, PPM_CHANNEL_COUNT);
 
 }
 
@@ -68,7 +69,7 @@ void loop()
 
 #endif
 
-
+    //ppm_get->get_latest_ppm(0);
 
 }
 

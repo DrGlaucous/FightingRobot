@@ -43,9 +43,7 @@ void TransmitterHandler::update()
         remote_control_packet_t outbox = {};
         outbox.channels = controller->GetReadyPacket();
 
-        controller->DisablePPM();
         radio->SendPacket(outbox);
-        controller->EnablePPM();
 
 
         if(radio->CheckForPacket(NULL) == RX_SUCCESS)

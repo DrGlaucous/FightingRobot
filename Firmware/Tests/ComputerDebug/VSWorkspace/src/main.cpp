@@ -2,9 +2,62 @@
 #include <math.h>
 #include <stddef.h>
 #include <stdint.h>
+#include <math.h>
 
 
 #define PI 3.14159265358979
+
+float mapf(float x, float in_min, float in_max, float out_min, float out_max) {
+	const float run = in_max - in_min;
+	if (run == 0.0) {
+		printf("map(): Invalid input range, min == max\n");
+		return -1; // AVR returns -1, SAM returns 0
+	}
+	const float rise = out_max - out_min;
+	const float delta = x - in_min;
+	return (delta * rise) / run + out_min;
+}
+
+long map(long x, long in_min, long in_max, long out_min, long out_max) {
+	const long run = in_max - in_min;
+	if (run == 0) {
+		printf("map(): Invalid input range, min == max");
+		return -1; // AVR returns -1, SAM returns 0
+	}
+	const long rise = out_max - out_min;
+	const long delta = x - in_min;
+	return (delta * rise) / run + out_min;
+}
+
+float TurnMap(float input, float t, float u, float degrees, float linear_slope) {
+
+	//float input = {};
+	//float t,u = {}; //map from (t), to (u)
+	//float linear_slope = {}; //V
+	//float degrees = {}; //W
+
+
+	//undefined prevention
+	if (t == 0)
+		return u; //y
+
+	//we expect this to be symmetrical, if we want 2nd or 4th quad, we use negative u
+	t = fabs(t);
+	
+
+	float absin = fabs(input);
+	float a = (u / (pow(t, degrees)) * (1 - linear_slope));
+	float c = linear_slope * (u / t);
+	float result = a * pow(absin, degrees) + c * absin;
+
+
+	//use negative half of the equation
+	if (input < 0)
+		result *= -1;
+
+	return result;
+
+}
 
 
 /*
@@ -222,9 +275,6 @@ private:
 
 };
 
-
-
-
 void setWheelSpeedProportions(int* wheel_1, int* wheel_2, int* wheel_3, int x, int y)
 {
 	//this is not faster if we have to initialize the entire class each time the funciton is called, but it works as a proof-of-concept for later
@@ -244,6 +294,10 @@ void setWheelSpeedProportions(int* wheel_1, int* wheel_2, int* wheel_3, int x, i
 
 
 
+
+
+
+
 int main(void)
 {
 	int x_vec = 0;
@@ -255,7 +309,33 @@ int main(void)
     setWheelSpeedProportions(&wheel_1, &wheel_2, &wheel_3, x_vec, y_vec);
 
 
+	//ranges from 0 to 512
+	//int turner = 0;
+	int degree_in = 20;
+
+	//map from, map to, degrees, slope
+	float degrees = mapf(degree_in, 0, 512, 1.0, 10.0);
+
+	//int output_rot[512] = {};
+
+	for (int turner = 0; turner < 512; ++turner)
+	{
+		int rot_m = map(turner, 0, 512, -0xFF, 0xFF);
+
+		rot_m = (int16_t)TurnMap(rot_m, 0xFF, 0xFF, degrees, 0);
+		//printf("%.4f,%d\n", degrees, rot_m);.
+		printf("%d\n",  rot_m);
+		//output_rot[turner] = rot_m;
+	}
+
+
+
+
+
     float stopper = x_vec + 1.0;
+
+
+
 
     return 1;
 

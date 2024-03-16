@@ -65,9 +65,12 @@
 
     #define PPM_INTURRUPT_PIN 16
     #define PPM_CHANNEL_COUNT CHANNEL_COUNT
-    #define PPM_BLANK_TIME 5000
-    #define PPM_MAX_WAIT_VALUE 1100
-    #define PPM_MIN_WAIT_VALUE 400
+    //was in millis, now in nanos
+    #define PPM_BLANK_TIME 2000000 //5000
+    #define PPM_MIN_WAIT_VALUE 500000 //500000
+
+    //#define PPM_MAX_WAIT_VALUE 1100
+
 
     //default 8 channel
     //#define PPM_BLANK_TIME 2100
@@ -97,17 +100,17 @@
 
     //DRIVEBASE PINS
 
-    //is 1, should be 3
-    #define MOTOR_3A_PIN 17
-    #define MOTOR_3B_PIN 16
 
-    //is 2, should be 1
+    #define MOTOR_3A_PIN 22//17
+    #define MOTOR_3B_PIN 19//16
+
+
     #define MOTOR_1A_PIN 18
     #define MOTOR_1B_PIN 5
 
-    //is 3, should be 2
-    #define MOTOR_2A_PIN 19
-    #define MOTOR_2B_PIN 22
+
+    #define MOTOR_2A_PIN 16//19
+    #define MOTOR_2B_PIN 17//22
 
     #define MOTOR_SLEEP_PIN 23
 
@@ -131,14 +134,17 @@
 #define TURN_IN 3
 #define SERVO_IN 2
 #define ESC_IN 4
-#define SERVO_MIN_IN 6
-#define SERVO_MAX_IN 7
+#define SERVO_MIN_IN 5
+#define TURN_RAMP_TUNE 6
+#define MOTOR_RAMP_TUNE 7
 
 //digital
-#define FLIPOVER_IN 0
-#define ESC_REVERSE_IN 1
-#define TWO_MODE_IN 2
-#define TWO_SELECT_IN 3
+#define FLIPOVER_IN 5
+#define ESC_REVERSE_IN 4
+#define TWO_MODE_IN 7
+#define TWO_SELECT_IN 6
+#define MASTER_ENABLE 2
+
 
 //normalization
 
@@ -154,12 +160,14 @@
 #define MOTOR_POLE_COUNT 14
 
 
-
+//backwards is 48-1047,
+//forwards is 1048-2047
 //dshot speeds (better than PWM, but only works with the dshot library)
-#define ESC_SPEED_MIDDLE 1024 //'0' in 3D mode
 //full speed in 3D mode
-#define ESC_SPEED_MIN 48
-#define ESC_SPEED_MAX 2048
+#define ESC_SPEED_MIN_R 48
+#define ESC_SPEED_MAX_R 1047
+#define ESC_SPEED_MIN_F 1048
+#define ESC_SPEED_MAX_F 2047
 
 
 

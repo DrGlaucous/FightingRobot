@@ -11,7 +11,7 @@ bool RadioHandlerExsists = false;
 QueueHandle_t gotten_data_holder;
 //do not write to this variable
 unsigned long rec_time = {};
-unsigned long last_rec_time = {};
+//unsigned long last_rec_time = {};
 
 void PacketSentCallback(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
@@ -22,7 +22,7 @@ void PacketGotCallback(const uint8_t * mac, const uint8_t *incomingData, int len
 {
     //Serial.println("Got");
     //Serial.printf("Bytes received: %d, Num: %d\n", len, (int)*incomingData);
-    last_rec_time = rec_time;
+    //last_rec_time = rec_time;
     rec_time = millis();
     BaseType_t high_task_wakeup = pdFALSE;
     xQueueOverwriteFromISR(gotten_data_holder, incomingData, &high_task_wakeup);
@@ -179,8 +179,6 @@ rx_status_t RadioNowHandler::CheckForPacket(packet_type_t* last_got)
 {
     if(xQueueReceive(gotten_data_holder, raw_queue_dump, 0) == pdTRUE)
     {
-        //get time difference
-        delta_time = deltaTime(rec_time, last_rec_time);
 
         //get the type of data we have
         packet_type_t type = *(packet_type_t*)raw_queue_dump;
@@ -224,7 +222,11 @@ remote_ack_packet_t RadioNowHandler::GetLastAckPacket()
 {return lask_ack_packet;}
 
 uint64_t RadioNowHandler::GetDeltaTime()
-{return delta_time;}
+{
+    //get time difference
+    //uint64_t delta_time = deltaTime(millis(), rec_time);
+    return deltaTime(millis(), rec_time);
+}
 
 
 

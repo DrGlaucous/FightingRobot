@@ -319,12 +319,9 @@ class RobotHandler
 
 
 
-#ifdef USING_ESP32
     DShotRMT* esc;
     Servo* servo_1;
     Servo* servo_2;
-#endif
-
 
 
     //last packet read from the radio
@@ -334,15 +331,21 @@ class RobotHandler
     int16_t xm, ym, rot_m= {};
 
     int16_t mot1, mot2, mot3 = {};
+    float ramp_tune = {};
 
     //weapon location and speed
     int16_t servo_angle = 0;
     int16_t servo_angle_min = 0;
-    int16_t servo_angle_max = 0;
+    //int16_t servo_angle_max = 0;
 
-    uint16_t esc_speed = 0;
-    bool esc_reversed = false; //CW vs CCW
+    uint16_t esc_get_speed = 0;
+    uint16_t esc_set_speed = 0;
+    uint8_t esc_reversed = 0; //CW vs CCW
 
+    //remote disable
+    bool remote_disable = false;
+    //current enable state
+    bool is_enabled = false;
 
     bool is_flipped_over = false;
     bool is_two_wheeled = false;
@@ -362,6 +365,10 @@ class RobotHandler
     void DumpChannelPacket();
     //dump processed cahnnels to serial moditor
     void DumpMappedPacket();
+
+    //for non-proportional motor ramping
+    float LogMap(float input, float i, float h, float strength);
+    float TurnMap(float input, float t, float u, float degrees, float linear_slope);
 
 
 };

@@ -75,7 +75,7 @@ class RadioNowHandler
 
     tx_status_t SendPacket(void* data, uint32_t size, packet_type_t type);
     
-    uint64_t delta_time = {};
+    //uint64_t delta_time = {};
 
     uint8_t raw_queue_dump[ESP_NOW_MAX_DATA_LEN] = {};
     remote_control_packet_t last_control_packet = {};

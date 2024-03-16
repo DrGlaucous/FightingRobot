@@ -1,23 +1,17 @@
 
 
 #include <Arduino.h>
-#include <PPMReader.h>
 
 #include "Controller.h"
 #include "configuration.h"
+#include "PPMRMT.h"
 #include "TimerTick.h"
 
 #ifdef IS_CONTROLLER
 
 ControllerHandler::ControllerHandler()
 {
-    ppm = new PPMReader(PPM_INTURRUPT_PIN, CHANNEL_COUNT, PPM_IS_INVERTED);
-
-    //setup PPM values for 12 channel mode
-    ppm->blankTime = PPM_BLANK_TIME;//10000;
-    ppm->maxChannelValue = PPM_MAX_WAIT_VALUE;
-    ppm->minChannelValue = PPM_MIN_WAIT_VALUE;
-
+    ppm = new PPMRMT(PPM_INTURRUPT_PIN, CHANNEL_COUNT);
 }
 
 ControllerHandler::~ControllerHandler()
@@ -29,23 +23,24 @@ controller_poll_result_t ControllerHandler::update()
 {
 
     //check that there is a full packet avalable
-    if(!ppm->hasFullPacket())
+    if(!ppm->check_ppm_queue())
         return ERR_NO_FRESH_PACKET;
 
 
     //get PPM from remote
     GetControlSurface(p_channels, PPM_CHANNEL_COUNT);
     
-
-    //check if values are OOB (report error if so, this usually means the transmitter is being turned on)
     controller_poll_result_t has_err = UPDATE_GOOD;
-    for(int i = 0; i < PPM_CHANNEL_COUNT; ++i)
-    {
-        if(p_channels[i] < PPM_MIN_WAIT_VALUE || p_channels[i] > PPM_MAX_WAIT_VALUE)
-        {
-            has_err = ERR_PPM_OUT_OF_RANGE;
-        }
-    }
+
+    //not needed anymore because OOB values will not be captured
+    //check if values are OOB (report error if so, this usually means the transmitter is being turned on)
+    // for(int i = 0; i < PPM_CHANNEL_COUNT; ++i)
+    // {
+    //     if(p_channels[i] < PPM_MIN_WAIT_VALUE || p_channels[i] > PPM_MAX_WAIT_VALUE)
+    //     {
+    //         has_err = ERR_PPM_OUT_OF_RANGE;
+    //     }
+    // }
 
     //test
     //PrintRawChannels(p_channels, PPM_CHANNEL_COUNT);
@@ -62,7 +57,7 @@ controller_poll_result_t ControllerHandler::update()
     }
     
     //test
-    PrintProcessedChannels();
+    //PrintProcessedChannels();
 
     return has_err;
 
@@ -88,10 +83,9 @@ void ControllerHandler::GetControlSurface(uint16_t* channel_array, uint16_t arra
 {
 
     //read PPM into packet struct
-    for (byte channel = 1; channel <= array_len; ++channel) {
+    for (byte channel = 0; channel < array_len; ++channel) {
 
-        //note: ppm.latestValidChannelValue is base-1!
-        channel_array[channel - 1] = ppm->latestValidChannelValue(channel, channel_array[channel - 1]);
+        channel_array[channel] = ppm->get_latest_ppm(channel);
         
         //test: report back serial values
         //Serial.printf("%d, \t", channel_array[channel - 1]);
@@ -220,25 +214,31 @@ void ControllerHandler::PrintRawChannels(uint16_t* channel_array, uint16_t array
 }
 void ControllerHandler::PrintProcessedChannels()
 {
+    // for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
+    // {
+    //     Serial.printf("Analog %d: Normal: %d\n", i, analog_channels[i].value_normalized);
+    // }
+
+    // for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
+    // {
+    //     Serial.printf("Digital %d: SW 1: %d SW 2: %d\n", i, digital_channels[i].switch_main, digital_channels[i].switch_second);
+    // }
+
+
+    //dump recieved channels
     for(int i = 0; i < ANALOG_CHANNEL_CNT; ++i)
     {
-        Serial.printf("Analog %d: Normal: %d\n", i, analog_channels[i].value_normalized);
+        Serial.printf(" %d :%4d ||", i, analog_channels[i].value_normalized);
     }
-
+    Serial.printf("|//|");
     for(int i = 0; i < DIGITAL_CHANNEL_CNT; ++i)
     {
-        Serial.printf("Digital %d: SW 1: %d SW 2: %d\n", i, digital_channels[i].switch_main, digital_channels[i].switch_second);
+        Serial.printf("%d :%2d :%2d||", i, digital_channels[i].switch_main, digital_channels[i].switch_second);
     }
+    Serial.printf("\n");
+
 }
 
 
-void ControllerHandler::DisablePPM()
-{
-    ppm->suspendInturrupt();
-}
-void ControllerHandler::EnablePPM()
-{
-    ppm->resumeInturrupt();
-}
 
 #endif

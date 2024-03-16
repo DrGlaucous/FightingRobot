@@ -3,10 +3,9 @@
 #pragma once
 
 #include <Arduino.h>
-#include <PPMReader.h>
 
 #include "configuration.h"
-
+#include "PPMRMT.h"
 
 
 //note: futaba's 12 channel protocol sends time-matched pairs of low then high signals.
@@ -124,13 +123,11 @@ class ControllerHandler
     //combines all channel values into a struct for transmission
     concatated_channels_t GetReadyPacket();
 
-    void DisablePPM();
-    void EnablePPM();
 
     private:
 
     //pointer to PPM
-    PPMReader* ppm;
+    PPMRMT* ppm;
 
     //array holding the smoothed ppm values from the controller
     uint16_t p_channels[CHANNEL_COUNT] = {};
