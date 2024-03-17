@@ -225,18 +225,18 @@ void RobotHandler::MapControllerData()
     //we may want to use exponential mapping for this instead to get the finer values
     ramp_tune = mapf(gotten_data.analog_channels[MOTOR_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, 0.0, 3.0);
 
-    is_flipped_over = gotten_data.digital_channels[FLIPOVER_IN] < 1;
-    is_two_wheeled = gotten_data.digital_channels[TWO_MODE_IN] < 1;
+    is_flipped_over = gotten_data.digital_channels[FLIPOVER_IN] > 1;
+    is_two_wheeled = gotten_data.digital_channels[TWO_MODE_IN] > 1;
     broken_wheel = gotten_data.digital_channels[TWO_SELECT_IN];
     remote_disable = gotten_data.digital_channels[MASTER_ENABLE] == 2;
 
     esc_reversed = gotten_data.digital_channels[ESC_REVERSE_IN];
 
-    //from the knobs, controls how far the servo arm will rotoate with the stick
-    servo_angle_min = map(gotten_data.analog_channels[SERVO_MIN_IN], NORMAL_MIN, NORMAL_MAX, SERVO_MIN, SERVO_MAX);
+    //from the back right lever, controls how far the servo arm will rotoate with the stick (0-180)
+    servo_angle_min = map(gotten_data.analog_channels[SERVO_MIN_IN], NORMAL_MAX, NORMAL_MIN, SERVO_MIN, SERVO_MAX);
 
     //reverse mapping (for servo) happens later (because both servos take different values)
-    servo_angle = map(gotten_data.analog_channels[SERVO_IN], NORMAL_MIN, NORMAL_MAX, servo_angle_min, SERVO_MAX);
+    servo_angle = map(gotten_data.analog_channels[SERVO_IN], NORMAL_MAX, NORMAL_MIN, servo_angle_min, SERVO_MAX);
 
 
     //handles reverse mapping (for ESC)
@@ -338,7 +338,7 @@ void RobotHandler::WriteMotors()
 
 
     //write servos (using degrees)
-    auto mirrored_servo_angle = SERVO_MAX == servo_angle_min ? servo_angle_min : map(servo_angle, servo_angle_min, SERVO_MAX, SERVO_MIN, servo_angle_min);
+    auto mirrored_servo_angle = SERVO_MAX - servo_angle;
     servo_1->write(is_flipped_over? mirrored_servo_angle : servo_angle);
     servo_2->write(is_flipped_over? servo_angle : mirrored_servo_angle);
 
