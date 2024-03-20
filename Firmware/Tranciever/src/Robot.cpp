@@ -167,8 +167,8 @@ void RobotHandler::resume()
     is_enabled = true;
 
 
-    servo_1->attach(SERVO_1_PIN);
-    servo_2->attach(SERVO_2_PIN);
+    servo_1->attach(SERVO_1_PIN, SERVO_1_MS_MIN, SERVO_1_MS_MAX);
+    servo_2->attach(SERVO_2_PIN, SERVO_2_MS_MIN, SERVO_2_MS_MAX);
 
 
     //enable wheelbase
@@ -221,6 +221,11 @@ void RobotHandler::MapControllerData()
     float degrees = mapf(gotten_data.analog_channels[TURN_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, 1.0, 5.0);
     rot_m = (int16_t)TurnMap(rot_m, XY_RADIUS, XY_RADIUS, degrees, 0);
 
+    //TEST
+    //temp_servo2_min = map(gotten_data.analog_channels[TURN_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, SERVO_2_MS_MAX - 100, SERVO_2_MS_MAX + 100);
+    //temp_servo2_max = map(gotten_data.analog_channels[MOTOR_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, SERVO_2_MS_MIN - 100, SERVO_2_MS_MIN + 100);
+
+
 
     //we may want to use exponential mapping for this instead to get the finer values
     ramp_tune = mapf(gotten_data.analog_channels[MOTOR_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, 0.0, 3.0);
@@ -254,9 +259,42 @@ void RobotHandler::SetWheelSpeedProportions()
     //Serial.printf("XM: %d\tYM %d\n", xm, ym);
     //xm = 0;
     //ym = XY_RADIUS;
-
-
     //rot_m = 0;
+
+    if(is_two_wheeled)
+    {
+        uint16_t mot_l = ym + rot_m;
+        uint16_t mot_r = -ym + rot_m;
+
+        if(is_flipped_over)
+        {
+            mot_l *= -1;
+            mot_r *= -1;
+        }
+
+        //do logarithmic mapping
+        mot_l = (int16_t)LogMap(mot_l, XY_RADIUS, XY_RADIUS, ramp_tune);
+        mot_r = (int16_t)LogMap(mot_r, XY_RADIUS, XY_RADIUS, ramp_tune);
+
+        switch(broken_wheel)
+        {
+            defualt:
+            case 0: //1
+                mot3 = mot_l;
+                mot2 = mot_r;
+                break;
+            case 1: //2
+                mot1 = mot_l;
+                mot3 = mot_r;
+                break;
+            case 2: //3
+                mot2 = mot_l;
+                mot1 = mot_r;
+                break;
+        }
+        //no need to do other mapping
+        return;
+    }
 
     //vector magnitude
     unsigned short magnitiude = (unsigned short)sqrt(xm*xm + ym*ym);
@@ -339,10 +377,12 @@ void RobotHandler::WriteMotors()
 
     //write servos (using degrees)
     auto mirrored_servo_angle = SERVO_MAX - servo_angle;
-    servo_1->write(is_flipped_over? mirrored_servo_angle : servo_angle);
-    servo_2->write(is_flipped_over? servo_angle : mirrored_servo_angle);
+    int16_t demapped_1 = map(is_flipped_over? mirrored_servo_angle : servo_angle, SERVO_MIN, SERVO_MAX, SERVO_1_MS_MIN, SERVO_1_MS_MAX);
+    int16_t demapped_2 = map(is_flipped_over? mirrored_servo_angle : servo_angle, SERVO_MIN, SERVO_MAX, SERVO_2_MS_MIN, SERVO_2_MS_MAX);
+    servo_1->write(demapped_1);
+    servo_2->write(demapped_2);
 
-    //Serial.printf("S1: %5d S2: %5d\n", servo_angle, mirrored_servo_angle);
+    //Serial.printf("S1: %5d S2: %5d || M2Min: %5d :: M2Max %5d\n", servo_1->readMicroseconds(), servo_2->readMicroseconds(), temp_servo2_min, temp_servo2_max);
 
     //write ESC
     if(TimerHandler::DeltaTimeMillis(&last_esc_time, 2))
@@ -357,7 +397,8 @@ void RobotHandler::WriteMotors()
 
 void RobotHandler::ReadVoltage()
 {
-    battery_voltage = analogRead(VOLTMETER_PIN) * VOLTMETER_SLOPE;
+    battery_voltage = analogRead(VOLTMETER_PIN) * VOLTMETER_SLOPE + VOLTMETER_OFFSET;
+    //Serial.printf("Volt: %5.3f, ARead: %d\n", battery_voltage, (int)analogRead(VOLTMETER_PIN));
 }
 
 

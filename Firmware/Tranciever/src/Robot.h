@@ -338,6 +338,9 @@ class RobotHandler
     int16_t servo_angle_min = 0;
     //int16_t servo_angle_max = 0;
 
+    int16_t temp_servo2_min = {};
+    int16_t temp_servo2_max = {};
+
     uint16_t esc_get_speed = 0;
     uint16_t esc_set_speed = 0;
     uint8_t esc_reversed = 0; //CW vs CCW

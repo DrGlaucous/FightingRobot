@@ -50,8 +50,9 @@ void TransmitterHandler::update()
         {
             led_state = !led_state;
             digitalWrite(LED_BUILTIN, led_state);
-            Serial.println("Got Telemetry");
-        }
+            //Serial.println("Got Telemetry");
+            remote_ack_packet_t ackpack = radio->GetLastAckPacket();
+            Serial.printf("Volt: %5.3f, RPM: %d\n", ackpack.battery_voltage, ackpack.motor_rpm);
 
     }
     

@@ -22,7 +22,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-//#define IS_CONTROLLER
+#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////
@@ -89,7 +89,8 @@
     #define KEEPALIVE_TIMEOUT_MS 1000
 
     //slope mapping based on experimetnal data and resistor values (TODO: make this parametric)
-    #define VOLTMETER_SLOPE 0.0126 + 2.25
+    #define VOLTMETER_SLOPE 0.0029
+    #define VOLTMETER_OFFSET 0.4129
 
     //h-bridge operation:
     //HI-HI is break
@@ -139,8 +140,8 @@
 #define MOTOR_RAMP_TUNE 7
 
 //digital
-#define FLIPOVER_IN 5
-#define ESC_REVERSE_IN 4
+#define FLIPOVER_IN 1//5
+#define ESC_REVERSE_IN 0//4
 #define TWO_MODE_IN 7
 #define TWO_SELECT_IN 6
 #define MASTER_ENABLE 2
@@ -151,10 +152,16 @@
 //analog pins go from 0-255, so this must be within that range
 #define XY_RADIUS 0xFF
 
+//analog servos have slightly different values that are mapped from the normalized range
+#define SERVO_1_MS_MIN 600 //500 //604
+#define SERVO_1_MS_MAX 2200 //2500 //2200
+
+#define SERVO_2_MS_MIN 660 //500 //660
+#define SERVO_2_MS_MAX 2100 //2500 //2100
+//normalized range, shared between both servos
 #define SERVO_MIN 0
-#define SERVO_MAX 180
-//range of motion on one side (depricated in favor of making this adjustable using the knobs on the remote)
-//#define SERVO_RANGE 100
+#define SERVO_MAX 512
+
 
 //number of magnets in the motor (for erpm measurements, only used in dshot mode)
 #define MOTOR_POLE_COUNT 14
