@@ -53,6 +53,7 @@ void TransmitterHandler::update()
             //Serial.println("Got Telemetry");
             remote_ack_packet_t ackpack = radio->GetLastAckPacket();
             Serial.printf("Volt: %5.3f, RPM: %d\n", ackpack.battery_voltage, ackpack.motor_rpm);
+        }
 
     }
     

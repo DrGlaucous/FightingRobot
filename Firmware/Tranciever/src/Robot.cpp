@@ -247,8 +247,8 @@ void RobotHandler::MapControllerData()
     //handles reverse mapping (for ESC)
     esc_set_speed = esc_reversed == 1 ? DSHOT_CMD_MOTOR_STOP : 
     (!!is_flipped_over ^ !!esc_reversed) ? 
-    map(gotten_data.analog_channels[ESC_IN], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_R, ESC_SPEED_MAX_R) :
-    map(gotten_data.analog_channels[ESC_IN], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_F, ESC_SPEED_MAX_F);
+    map(gotten_data.analog_channels[ESC_IN], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_F, ESC_SPEED_MAX_F) :
+    map(gotten_data.analog_channels[ESC_IN], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_R, ESC_SPEED_MAX_R);
 
 
 }
@@ -263,8 +263,21 @@ void RobotHandler::SetWheelSpeedProportions()
 
     if(is_two_wheeled)
     {
-        uint16_t mot_l = ym + rot_m;
-        uint16_t mot_r = -ym + rot_m;
+        int16_t mot_l = -ym + rot_m;
+        int16_t mot_r = ym + rot_m;
+        int16_t mot_b = 0; //back motor
+
+        //speed limiting
+        if(mot_l > XY_RADIUS)
+            mot_l = XY_RADIUS;
+        if(mot_l < -XY_RADIUS)
+            mot_l = -XY_RADIUS;
+
+        if(mot_r > XY_RADIUS)
+            mot_r = XY_RADIUS;
+        if(mot_r < -XY_RADIUS)
+            mot_r = -XY_RADIUS;
+
 
         if(is_flipped_over)
         {
@@ -273,8 +286,8 @@ void RobotHandler::SetWheelSpeedProportions()
         }
 
         //do logarithmic mapping
-        mot_l = (int16_t)LogMap(mot_l, XY_RADIUS, XY_RADIUS, ramp_tune);
-        mot_r = (int16_t)LogMap(mot_r, XY_RADIUS, XY_RADIUS, ramp_tune);
+        //mot_l = (int16_t)LogMap(mot_l, XY_RADIUS, XY_RADIUS, ramp_tune);
+        //mot_r = (int16_t)LogMap(mot_r, XY_RADIUS, XY_RADIUS, ramp_tune);
 
         switch(broken_wheel)
         {
@@ -282,16 +295,23 @@ void RobotHandler::SetWheelSpeedProportions()
             case 0: //1
                 mot3 = mot_l;
                 mot2 = mot_r;
+
+                mot1 = mot_b;
                 break;
             case 1: //2
                 mot1 = mot_l;
                 mot3 = mot_r;
+
+                mot2 = mot_b;
                 break;
             case 2: //3
                 mot2 = mot_l;
                 mot1 = mot_r;
+
+                mot3 = mot_b;                
                 break;
         }
+        //Serial.printf("Mot1: %-4d Mot2: %-4d Mot3: %-4d || ym: %d, rotm: %d\n", mot1, mot2, mot3, ym, rot_m);
         //no need to do other mapping
         return;
     }
@@ -378,10 +398,11 @@ void RobotHandler::WriteMotors()
     //write servos (using degrees)
     auto mirrored_servo_angle = SERVO_MAX - servo_angle;
     int16_t demapped_1 = map(is_flipped_over? mirrored_servo_angle : servo_angle, SERVO_MIN, SERVO_MAX, SERVO_1_MS_MIN, SERVO_1_MS_MAX);
-    int16_t demapped_2 = map(is_flipped_over? mirrored_servo_angle : servo_angle, SERVO_MIN, SERVO_MAX, SERVO_2_MS_MIN, SERVO_2_MS_MAX);
+    int16_t demapped_2 = map(is_flipped_over? servo_angle : mirrored_servo_angle, SERVO_MIN, SERVO_MAX, SERVO_2_MS_MIN, SERVO_2_MS_MAX);
     servo_1->write(demapped_1);
     servo_2->write(demapped_2);
 
+    //Serial.printf("S1: %d S2: %d\n", demapped_1, demapped_2);
     //Serial.printf("S1: %5d S2: %5d || M2Min: %5d :: M2Max %5d\n", servo_1->readMicroseconds(), servo_2->readMicroseconds(), temp_servo2_min, temp_servo2_max);
 
     //write ESC
