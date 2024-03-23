@@ -22,7 +22,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-//#define IS_CONTROLLER
+#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////
@@ -102,16 +102,16 @@
     //DRIVEBASE PINS
 
 
-    #define MOTOR_3A_PIN 22//17
-    #define MOTOR_3B_PIN 19//16
+    #define MOTOR_3A_PIN 16
+    #define MOTOR_3B_PIN 17
 
 
     #define MOTOR_1A_PIN 18
     #define MOTOR_1B_PIN 5
 
 
-    #define MOTOR_2A_PIN 16//19
-    #define MOTOR_2B_PIN 17//22
+    #define MOTOR_2A_PIN 19
+    #define MOTOR_2B_PIN 22
 
     #define MOTOR_SLEEP_PIN 23
 
@@ -153,11 +153,11 @@
 #define XY_RADIUS 0xFF
 
 //analog servos have slightly different values that are mapped from the normalized range
-#define SERVO_1_MS_MIN 600 //500 //604
-#define SERVO_1_MS_MAX 2200 //2500 //2200
+#define SERVO_1_MS_MIN 500//600 //500 //604
+#define SERVO_1_MS_MAX 2500//2200 //2500 //2200
 
-#define SERVO_2_MS_MIN 660 //500 //660
-#define SERVO_2_MS_MAX 2100 //2500 //2100
+#define SERVO_2_MS_MIN 500//660 //500 //660
+#define SERVO_2_MS_MAX 2500//2100 //2500 //2100
 //normalized range, shared between both servos
 #define SERVO_MIN 0
 #define SERVO_MAX 512
