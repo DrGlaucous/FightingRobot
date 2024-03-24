@@ -230,7 +230,7 @@ void RobotHandler::MapControllerData()
     //we may want to use exponential mapping for this instead to get the finer values
     ramp_tune = mapf(gotten_data.analog_channels[MOTOR_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, 0.0, 3.0);
 
-    is_flipped_over = gotten_data.digital_channels[FLIPOVER_IN] > 1;
+    is_flipped_over = gotten_data.digital_channels[FLIPOVER_IN] < 1;
     is_two_wheeled = gotten_data.digital_channels[TWO_MODE_IN] > 1;
     broken_wheel = gotten_data.digital_channels[TWO_SELECT_IN];
     remote_disable = gotten_data.digital_channels[MASTER_ENABLE] == 2;
