@@ -1,1 +1,0 @@
-This test program is meant to try out the features of the RFM69HW radio module. This was originally made with the creation of LittleBuddy, an ISkipper based on the STM32.

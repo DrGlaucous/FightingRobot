@@ -1,1 +1,0 @@
-This test program is for getting PPM decoding to work with the STM32, so it can use the RFM69HW to transmit messages from any RC control surface.

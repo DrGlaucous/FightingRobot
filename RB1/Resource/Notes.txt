@@ -1,0 +1,125 @@
+hardware SPI on an ESP32:
+default:
+
+VSPI:
+MOSI 23
+MISO 19
+SCLK 18
+CS 5
+
+HSPI
+MOSI 13
+MISO 12
+SCLK 14
+CS 15
+
+in arduino IDE, these are defined as their respective names
+(note: these pins can be changed)
+
+
+to change SPI pins manually in a library that doesn't support custom initialization, use:
+SPI.begin(SCK, MISO, MOSI, SS);
+
+
+for multiple SPI busses, initialize
+vspi = new SPIClass(VSPI);
+hspi = new SPIClass(HSPI);
+
+see more:
+https://randomnerdtutorials.com/esp32-spi-communication-arduino/
+
+
+on top and bottom walls, other robots use 1.5-2mm thick shells
+
+(we could probably do this for the internal structure as well)
+
+for edge walls, 3-5mm will suffice (put curves so the robot cannot sit on them)
+
+
+
+
+
+
+Controller template was gotten from here:
+https://www.dronevibes.com/forums/threads/futaba-t14sg-radio-controller-function-map-pdf.24361/
+
+
+Futaba 12 channel troubles:
+
+reset line is
+
+long time LOW->long time HIGH
+
+
+each channel has a LOW time that matches a HIGH time
+
+
+A channel may unexpectedly cut out before transmission is complete, completing a "cycle" prematurely.
+it will wait at least one complete cycle before finishing the half-done channel.
+
+in order to ensure that we get good signals every time, we need to detect the bad channel pauses.
+The easiest way to (possibly) do this is to only update all the channel values if we get all of them in one go.
+
+
+if we detect a reset rollover, we then move the waiting signals over to the visible surface ONLY if we got all of them. Partials will not count.
+
+
+
+
+
+have roughly 7 Oz on frame
+
+1.295 allocated for screws, worst case
+
+5.705 left for frame
+(some screws can be ommitted/glue used instead)
+
+16 Oz max
+
+
+1.0005 - PCB + componets
+3.327 - wheels + n20s * 3
+1.01 - 2205
+0.30 - ESC
+0.976 - servos
+2 - battery
+1.295 - screws
+
+-9.88 for all of this
+
+2.196 - side walls
+
+6 Ounces/170 grams to work with
+
+Blade: 9g
+Internal frame (as-is) + arm: 84
+
+(thin top shell, both sides: 60g)
+
+
+
+12.08 total rn + side walls
+
+
+
+
+
+oz
+3.73 - walls+roof
+0.81 - mot1
+2.6320 - mot2
+2.238 - wheels3
+2.74 - chassis + electrics
+2.00 - battery
+14.292 - total
+
+
+
+
+
+
+
+
+
+
+
