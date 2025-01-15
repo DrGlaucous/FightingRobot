@@ -1,0 +1,18 @@
+
+
+Robot navegated OK
+Weapon was too small
+Servo gears could not take the stress of the weapon
+
+
+Bigger blade = better (further reach, bigger hits)
+
+Compact the electronics
+(all really needed: ESP32, DRV883x1, Mini360Buck)
+
+
+
+
+
+
+
