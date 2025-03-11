@@ -7,8 +7,8 @@
 //espnow
 #define NETWORKID           4   // Must be the same for all nodes
 //custom MAC addresses
-#define SENDER_ADDR {0x30, 0xAE, 0xA4, 0x07, 0x0D, 0x64}
-#define REC_ADDR {0xA0, 0x0E, 0x04, 0x0F, 0xFD, 0x64}
+#define MY_ADDRESS {0x30, 0xAE, 0xA4, 0x07, 0x0D, 0x64}
+#define PEER_ADDRESS {0xA0, 0x0E, 0x04, 0x0F, 0xFD, 0x64}
 
 
 #define ENCRYPT       true // Set to "true" to use encryption
@@ -70,6 +70,26 @@
 
 
 //control surface mapping
+
+#define VERTICAL_LEFT 3
+#define HORIZONTAL_LEFT 4
+#define VERTICAL_RIGHT 2
+#define HORIZONTAL_RIGHT 1
+#define PADDLE_LEFT 5
+#define PADDLE_RIGHT 6
+#define TUNER_LEFT 7
+#define TUNER_RIGHT 8
+
+//(these are indexed immediately after the analog channels, each one can be 0,1,2 and represents a single switch on the controller)
+#define DIG_SA 1
+#define DIG_POI 2
+#define DIG_SC 3
+#define DIG_FS 4
+#define DIG_ATT 5
+#define DIG_SF 6
+#define DIG_DRRUD 7
+#define DIG_SH 8
+
 
 //analog
 #define X_IN 0

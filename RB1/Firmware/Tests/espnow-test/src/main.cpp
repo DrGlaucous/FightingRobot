@@ -43,9 +43,9 @@ void OnDataSent(const uint8_t *mac_addr, esp_now_send_status_t status) {
 }
 
 // Callback when data is received
-void OnDataRecv(const uint8_t * mac, const uint8_t *incomingData, int len) {
+void OnDataRecv(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len) {
   Serial.print("Bytes received: ");
-  Serial.println(len);
+  Serial.println(data_len); 
 }
 
 
@@ -57,15 +57,6 @@ void setup()
 {
 
     Serial.begin(115200);
-    pinMode(MOTOR_3A_PIN, OUTPUT);
-    pinMode(MOTOR_3B_PIN, OUTPUT);
-
-    pinMode(MOTOR_SLEEP_PIN, OUTPUT);
-
-    digitalWrite(MOTOR_3A_PIN, true);
-    digitalWrite(MOTOR_3B_PIN, false);
-
-    digitalWrite(MOTOR_SLEEP_PIN, false);
 
     // Register peers
     memcpy(sender_info.peer_addr, sender_addr, 6);
@@ -127,7 +118,6 @@ void loop()
     static unsigned int l_state = 0;
     if(gTimer.DeltaTimeMillis(&delta_t, 500))
     {
-        digitalWrite(MOTOR_3A_PIN, l_state % 2);
         ++l_state;
 
         esp_err_t result = esp_now_send(NULL, (uint8_t *) &l_state, sizeof(l_state));

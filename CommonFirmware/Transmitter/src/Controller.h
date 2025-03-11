@@ -89,7 +89,8 @@ typedef struct channel_digital_s
 typedef struct concatated_channels_s
 {
     uint16_t analog_channels[ANALOG_CHANNEL_CNT] = {};
-    //2 switches per each digital channel
+    //2 switches can fit on each "digital" channel (so we only send 4 to the robot, but get 8 switches out)
+    //(these are indexed immediately after the analog channels, each one can be 0,1,2 and represents a single switch on the controller)
     uint8_t digital_channels[DIGITAL_CHANNEL_CNT * 2] = {};
 }concatated_channels_t;
 

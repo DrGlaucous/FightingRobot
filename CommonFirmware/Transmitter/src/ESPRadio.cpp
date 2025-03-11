@@ -76,8 +76,8 @@ RadioNowHandler::RadioNowHandler()
 
     //esp_now_register_send_cb(PacketSentCallback);
 
-    const uint8_t new_mac[] = SENDER_ADDR;
-    esp_now_peer_info_t peer = {REC_ADDR, ENCRYPTKEY_S};
+    const uint8_t new_mac[] = MY_ADDRESS;
+    esp_now_peer_info_t peer = {PEER_ADDRESS, ENCRYPTKEY_S};
 
     peer.channel = NETWORKID;
     peer.encrypt = ENCRYPT;

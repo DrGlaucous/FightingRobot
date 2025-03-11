@@ -6,15 +6,13 @@
 #include "configuration.h"
 #include "TimerTick.h"
 
-#ifdef USING_ESP32
 #include <ESP32Servo.h>
 #include <DShotRMT.h>
-#endif
+
 
 
 
 //test class for light blinking
-
 class BlinkerHandler
 {
     public:
