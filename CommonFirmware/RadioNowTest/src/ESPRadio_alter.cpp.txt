@@ -13,19 +13,6 @@ QueueHandle_t gotten_data_holder;
 unsigned long rec_time = {};
 //unsigned long last_rec_time = {};
 
-//the builtin version of this doesn't always read the most recent one, so we use this instead
-void readMacAddress(){
-  uint8_t baseMac[6];
-  esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, baseMac);
-  if (ret == ESP_OK) {
-    Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
-                  baseMac[0], baseMac[1], baseMac[2],
-                  baseMac[3], baseMac[4], baseMac[5]);
-  } else {
-    Serial.println("Failed to read MAC address");
-  }
-}
-
 void  PacketSentCallback(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
     //Serial.print("\r\nLast Packet Send Status:\t");
@@ -82,50 +69,28 @@ RadioNowHandler::RadioNowHandler()
     //setup the radios
     WiFi.mode(WIFI_STA);
 
+    Serial.print("[OLD] ESP32 Board MAC Address:  ");
+    Serial.println(WiFi.macAddress());
+
     //Init ESP-NOW
     if (esp_now_init() != ESP_OK) {
         Serial.println("Error initializing ESP-NOW");
         return;
     }
 
-    //esp_now_register_send_cb(PacketSentCallback);
+    esp_now_register_send_cb(PacketSentCallback);
+
 
     const uint8_t new_mac[] = MY_ADDRESS;
+    esp_wifi_set_mac(WIFI_IF_STA, new_mac);
+
+
+
     esp_now_peer_info_t peer = {PEER_ADDRESS, ENCRYPTKEY_S};
 
     peer.channel = NETWORKID;
     peer.encrypt = ENCRYPT;
 
-
-    if(ENCRYPT) {
-        esp_now_set_pmk((uint8_t*)ENCRYPTKEY_P);
-    }
-
-
-    esp_wifi_set_mac(WIFI_IF_STA, new_mac);
-
-
-    switch(esp_wifi_set_channel(NETWORKID, WIFI_SECOND_CHAN_ABOVE))
-    {
-        default:
-        case 0:
-            Serial.println("Success!");
-            break;
-        case ESP_ERR_WIFI_NOT_INIT:
-            Serial.println("ESP_ERR_WIFI_NOT_INIT!");
-            break;
-
-        case ESP_ERR_WIFI_IF:
-            Serial.println("ESP_ERR_WIFI_IF!");
-            break;
-        case ESP_ERR_INVALID_ARG:
-            Serial.println("ESP_ERR_INVALID_ARG!");
-            break;
-
-    }
-
-
-    //bleeding edge IDF doesn't support encryption
     /*
     *          - ESP_OK : succeed
     *          - ESP_ERR_ESPNOW_NOT_INIT : ESPNOW is not initialized
@@ -163,11 +128,38 @@ RadioNowHandler::RadioNowHandler()
 
         return;
     }
+
     
+
+    //if(ENCRYPT) {
+    //    esp_now_set_pmk((uint8_t*)ENCRYPTKEY_P);
+    //}
+
+
+    // switch(esp_wifi_set_channel(NETWORKID, WIFI_SECOND_CHAN_ABOVE))
+    // {
+    //     default:
+    //     case 0:
+    //         Serial.println("Success!");
+    //         break;
+    //     case ESP_ERR_WIFI_NOT_INIT:
+    //         Serial.println("ESP_ERR_WIFI_NOT_INIT!");
+    //         break;
+    //     case ESP_ERR_WIFI_IF:
+    //         Serial.println("ESP_ERR_WIFI_IF!");
+    //         break;
+    //     case ESP_ERR_INVALID_ARG:
+    //         Serial.println("ESP_ERR_INVALID_ARG!");
+    //         break;
+    // }
+
+
+
     esp_now_register_recv_cb(PacketGotCallback);
     
     Serial.print("[NEW] ESP32 Board MAC Address:  ");
-    readMacAddress();
+    Serial.println(WiFi.macAddress());
+
 
 }
 

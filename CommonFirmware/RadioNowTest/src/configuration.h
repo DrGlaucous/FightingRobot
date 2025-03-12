@@ -18,7 +18,7 @@
 
 #define NETWORKID           4   // Must be the same for all nodes
 
-#define ENCRYPT       true // Set to "true" to use encryption
+#define ENCRYPT       false // Set to "true" to use encryption (must be fixed in bleeding edge Jason2866 idf)
 #define ENCRYPTKEY_S {0xA0,0xA0,0xFF,0x00,0xFF,0xA0,0xA0,0xA0,0xFF,0x45,0xA0,0xA0,0x26,0x20,0x43,0xA0}
 #define ENCRYPTKEY_P    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
 

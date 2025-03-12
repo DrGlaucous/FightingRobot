@@ -35,10 +35,15 @@
     #define SPI_NSS_PIN SLAVE_PIN
 #endif
 
+//this is set to 0 for some odd reason...
+//...and it can't be changed because it's hard-baked
+// #ifdef CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM
+// #undef CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM
+// #define CONFIG_ESP_WIFI_ESPNOW_MAX_ENCRYPT_NUM 7
+// #endif
 
-
-#define ENCRYPT       true // Set to "true" to use encryption
-#define ENCRYPTKEY    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
+//#define ENCRYPT       true // Set to "true" to use encryption
+//#define ENCRYPTKEY    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
 
 // Use ACKnowledge when sending messages (or not):
 #define USEACK        true // Request ACKs or not
