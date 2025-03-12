@@ -29,9 +29,8 @@ void TransmitterHandler::update()
     //controller->update();
 
 
-    //TEST
-    //5 ms have elapsed
-    if(TimerHandler::DeltaTimeMillis(&last_time, 100)) {
+    //TEST: send a spoof packet
+    if(TimerHandler::DeltaTimeMillis(&last_time, 1000)) {
         remote_control_packet_t outbox = remote_control_packet_t{};
         outbox.channels.analog_channels[0] = 64;
         radio->SendPacket(outbox);
@@ -43,6 +42,8 @@ void TransmitterHandler::update()
     //instead, send at the soonest update opportunity (first stable packet collected)
     if(controller->update() == UPDATE_GOOD)
     {
+
+        Serial.printf("Update Good\n");
 
         remote_control_packet_t outbox = {};
         outbox.channels = controller->GetReadyPacket();

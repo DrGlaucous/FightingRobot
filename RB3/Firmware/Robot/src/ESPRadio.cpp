@@ -13,19 +13,34 @@ QueueHandle_t gotten_data_holder;
 unsigned long rec_time = {};
 //unsigned long last_rec_time = {};
 
-void PacketSentCallback(const uint8_t *mac_addr, esp_now_send_status_t status)
+//the builtin version of this doesn't always read the most recent one, so we use this instead
+void readMacAddress(){
+  uint8_t baseMac[6];
+  esp_err_t ret = esp_wifi_get_mac(WIFI_IF_STA, baseMac);
+  if (ret == ESP_OK) {
+    Serial.printf("%02x:%02x:%02x:%02x:%02x:%02x\n",
+                  baseMac[0], baseMac[1], baseMac[2],
+                  baseMac[3], baseMac[4], baseMac[5]);
+  } else {
+    Serial.println("Failed to read MAC address");
+  }
+}
+
+void  PacketSentCallback(const uint8_t *mac_addr, esp_now_send_status_t status)
 {
     //Serial.print("\r\nLast Packet Send Status:\t");
     //Serial.println(status == ESP_NOW_SEND_SUCCESS ? "Delivery Success" : "Delivery Fail");
 }
-void PacketGotCallback(const uint8_t * mac, const uint8_t *incomingData, int len)
+//void  PacketGotCallback(const uint8_t * mac, const uint8_t *incomingData, int len)
+void  PacketGotCallback(const esp_now_recv_info_t *esp_now_info, const uint8_t *data, int data_len) 
 {
     //Serial.println("Got");
     //Serial.printf("Bytes received: %d, Num: %d\n", len, (int)*incomingData);
     //last_rec_time = rec_time;
     rec_time = millis();
     BaseType_t high_task_wakeup = pdFALSE;
-    xQueueOverwriteFromISR(gotten_data_holder, incomingData, &high_task_wakeup);
+    xQueueOverwriteFromISR(gotten_data_holder, data, &high_task_wakeup);
+
 }
 
 //delta time
@@ -75,16 +90,16 @@ RadioNowHandler::RadioNowHandler()
 
     //esp_now_register_send_cb(PacketSentCallback);
 
-
     const uint8_t new_mac[] = MY_ADDRESS;
     esp_now_peer_info_t peer = {PEER_ADDRESS, ENCRYPTKEY_S};
-
 
     peer.channel = NETWORKID;
     peer.encrypt = ENCRYPT;
 
-    if(ENCRYPT)
+
+    if(ENCRYPT) {
         esp_now_set_pmk((uint8_t*)ENCRYPTKEY_P);
+    }
 
 
     esp_wifi_set_mac(WIFI_IF_STA, new_mac);
@@ -109,15 +124,50 @@ RadioNowHandler::RadioNowHandler()
 
     }
 
-    if (esp_now_add_peer(&peer) != ESP_OK){
-        Serial.println("Failed to add peer");
+
+    //bleeding edge IDF doesn't support encryption
+    /*
+    *          - ESP_OK : succeed
+    *          - ESP_ERR_ESPNOW_NOT_INIT : ESPNOW is not initialized
+    *          - ESP_ERR_ESPNOW_ARG : invalid argument
+    *          - ESP_ERR_ESPNOW_FULL : peer list is full
+    *          - ESP_ERR_ESPNOW_NO_MEM : out of memory
+    *          - ESP_ERR_ESPNOW_EXIST : peer has existed
+    */
+    esp_err_t peer_result = esp_now_add_peer(&peer);
+    if (peer_result != ESP_OK){
+        Serial.printf("Failed to add peer: %d: ", peer_result);
+
+        switch(peer_result) {
+            case ESP_ERR_ESPNOW_NOT_INIT: {
+                Serial.printf("ESP_ERR_ESPNOW_NOT_INIT\n");
+                break;
+            }
+            case ESP_ERR_ESPNOW_ARG: {
+                Serial.printf("ESP_ERR_ESPNOW_ARG\n");
+                break;
+            }
+            case ESP_ERR_ESPNOW_FULL: {
+                Serial.printf("ESP_ERR_ESPNOW_FULL\n");
+                break;
+            }
+            case ESP_ERR_ESPNOW_NO_MEM: {
+                Serial.printf("ESP_ERR_ESPNOW_NO_MEM\n");
+                break;
+            }
+            case ESP_ERR_ESPNOW_EXIST: {
+                Serial.printf("ESP_ERR_ESPNOW_EXIST\n");
+                break;
+            }
+        }
+
         return;
     }
     
-    //esp_now_register_recv_cb(PacketGotCallback);
+    esp_now_register_recv_cb(PacketGotCallback);
     
     Serial.print("[NEW] ESP32 Board MAC Address:  ");
-    Serial.println(WiFi.macAddress());
+    readMacAddress();
 
 }
 
@@ -144,7 +194,7 @@ tx_status_t RadioNowHandler::SendPacket(remote_control_packet_t data)
 {
     return SendPacket(&data, sizeof(data), PACKET_CONTROL_VALUES);
 }
-tx_status_t RadioNowHandler::SendPacket(void* data, uint32_t size)
+tx_status_t RadioNowHandler::SendPacket(const void* data, uint32_t size)
 {
     return SendPacket(data, size, PACKET_ARRAY);
 }
@@ -152,7 +202,7 @@ tx_status_t RadioNowHandler::SendPacket(unsigned int data)
 {
     return SendPacket(&data, sizeof(data), PACKET_INTEGER);
 }
-tx_status_t RadioNowHandler::SendPacket(void* data, uint32_t size, packet_type_t type)
+tx_status_t RadioNowHandler::SendPacket(const void* data, uint32_t size, packet_type_t type)
 {
     if(sizeof(type) + size > ESP_NOW_MAX_DATA_LEN)
         return TX_FAIL;

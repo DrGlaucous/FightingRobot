@@ -14,7 +14,7 @@
 #define FREQUENCY     RF69_915MHZ
 #define IS_HIGH_POWER true
 
-#define ENCRYPT       true // Set to "true" to use encryption
+#define ENCRYPT       false // Set to "true" to use encryption
 #define ENCRYPTKEY_S {0xA0,0xA0,0xFF,0x00,0xFF,0xA0,0xA0,0xA0,0xFF,0x45,0xA0,0xA0,0x26,0x20,0x43,0xA0}
 #define ENCRYPTKEY_P    "HOTCRYSTALBABESS" //"TOPSECRETPASSWRD" // Use the same 16-byte key on all nodes
 
@@ -22,7 +22,7 @@
 ////////BEHAVIOR SETTINGS////////
 
 //what end of the stick the firmware is on
-//#define IS_CONTROLLER
+#define IS_CONTROLLER
 
 
 ////////////////PPM SETTINGS////////////////

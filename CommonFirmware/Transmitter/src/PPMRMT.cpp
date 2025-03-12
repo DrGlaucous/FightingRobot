@@ -136,7 +136,7 @@ PPMRMT::PPMRMT(uint8_t s_pin, uint16_t s_channel_count)
     rx_callback_datapack.rx_chan = rx_chan;
     rx_callback_datapack.channel_count = channel_count;
 
-    //Serial.println("t");
+    Serial.println("t");
 
     handle_error(rmt_enable(rx_chan));
 
@@ -144,7 +144,7 @@ PPMRMT::PPMRMT(uint8_t s_pin, uint16_t s_channel_count)
     //start listening for a response
     rmt_receive(rx_callback_datapack.rx_chan, rx_callback_datapack.raw_symbols, 64 * sizeof(rmt_symbol_word_t), rx_callback_datapack.rx_config);
 
-    //Serial.println("u");
+    Serial.println("u");
 
 }
 

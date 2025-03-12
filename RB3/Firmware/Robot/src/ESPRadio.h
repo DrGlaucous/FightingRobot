@@ -5,9 +5,8 @@
 #include <esp_wifi.h>
 #include <Wifi.h>
 
-#include "Controller.h"
 #include "configuration.h"
-
+#include "Controller.h"
 
 
 //note: this is for readability, the packet must be cast to a char for transmission
@@ -31,7 +30,7 @@ typedef enum rx_status_e
 typedef enum tx_status_e
 {
     TX_SUCCESS = 0,
-    TX_FAIL = 0,
+    TX_FAIL = 1,
 }tx_status_t;
 
 
@@ -63,7 +62,7 @@ class RadioNowHandler
     tx_status_t SendPacket(unsigned int data);
     tx_status_t SendPacket(remote_control_packet_t data);
     tx_status_t SendPacket(remote_ack_packet_t data);
-    tx_status_t SendPacket(void* data, uint32_t size);
+    tx_status_t SendPacket(const void* data, uint32_t size);
 
     remote_control_packet_t GetLastControlPacket();
     remote_ack_packet_t GetLastAckPacket();
@@ -73,7 +72,7 @@ class RadioNowHandler
 
     private:
 
-    tx_status_t SendPacket(void* data, uint32_t size, packet_type_t type);
+    tx_status_t SendPacket(const void* data, uint32_t size, packet_type_t type);
     
     //uint64_t delta_time = {};
 
@@ -84,24 +83,6 @@ class RadioNowHandler
 
 
 };
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 
 
 
