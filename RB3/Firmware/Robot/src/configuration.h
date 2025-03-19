@@ -64,13 +64,13 @@
 
 
 //WEAPON PINS
-#define ESC_PIN 5
+#define ESC_PIN 8
 
 //ENCODER PINS
-#define MOTOR_1_ENCA 9
-#define MOTOR_1_ENCB 8
-#define MOTOR_2_ENCA 7
-#define MOTOR_2_ENCB 6
+#define MOTOR_1_ENCA 10
+#define MOTOR_1_ENCB 7
+#define MOTOR_2_ENCA 6
+#define MOTOR_2_ENCB 5
 
 
 
