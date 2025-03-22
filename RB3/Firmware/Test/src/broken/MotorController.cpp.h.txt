@@ -1,0 +1,87 @@
+#pragma once
+
+
+#define ANALOG_MAX 255
+#define ANALOG_MIN 0
+
+
+typedef enum IsrSlotNumber {
+    IsrSlotZero,
+    IsrSlotOne
+}IsrSlotNumber;
+
+
+class MotorController{
+    
+
+    public:
+
+    MotorController(
+        int enca_pin,
+        int encb_pin,
+        int motor_a_pin,
+        int motor_b_pin,
+        IsrSlotNumber sl
+    );
+
+
+    ~MotorController();
+
+    void begin();
+
+    float tick(int target_speed, bool is_disabled, bool direct_speed_map);
+
+    void isr_handler();
+
+    private:
+
+    int enca_pin = -1;
+    int encb_pin = -1;
+    int motor_a_pin = -1;
+    int motor_b_pin = -1;
+
+
+    int motor_output = 0; //value to be written to the motor (result of the PID or direct mapping)
+    bool has_began = false;
+
+    int last_millis = 0;
+    int motor_tick_ct = 0; //holds raw absolute position of the motor
+    int last_motor_tick_ct = 0; //for delta ticks
+    int time_since_motor_tick = 0; //holds the number of cycles since the last encoder change interrupt
+
+
+    // uint8_t encoder_state = 0;
+
+    // PIDControllerF* motor_pid = NULL;
+    // IsrSlotNumber slot_num = IsrSlotOne; //keep track of this for removing ISR on destruct
+    // int32_t encoder_value = 0;
+
+
+
+    // // //isrs (one for each instance of the class we can run)
+    // // static void isr_0();
+    // // static MotorController* this_0;
+
+    // // static void isr_1();
+    // // static MotorController* this_1;
+
+
+
+};
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+

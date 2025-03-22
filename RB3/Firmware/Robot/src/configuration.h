@@ -1,5 +1,5 @@
 //Configuration
-
+#pragma once
 
 
 ////////RADIO SETTINGS////////

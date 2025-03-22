@@ -1,0 +1,242 @@
+#include <Arduino.h>
+#include <math.h>
+#include "configuration.h"
+#include "PidController.h"
+#include "MotorController.h"
+
+
+
+static void isr_0();
+static Apple* this_0;
+
+static void isr_1();
+static Apple* this_1;
+
+
+void isr_0() {
+    this_0->isr_handler();
+}
+void isr_1() {
+    this_1->isr_handler();
+}
+
+
+void Apple::isr_handler() {
+    
+
+
+    bool CLKstate = digitalRead(enca_pin);
+    bool DTstate = digitalRead(encb_pin);
+
+    switch (encoder_state) {
+        case 0:                         // Idle state, encoder not turning
+            if (!CLKstate){             // Turn clockwise and CLK goes low first
+                encoder_state = 1;
+            } else if (!DTstate) {      // Turn anticlockwise and DT goes low first
+                encoder_state = 4;
+            }
+            break;
+        // Clockwise rotation
+        case 1:                     
+            if (!DTstate) {             // Continue clockwise and DT will go low after CLK
+                encoder_state = 2;
+            } 
+            break;
+        case 2:
+            if (CLKstate) {             // Turn further and CLK will go high first
+                encoder_state = 3;
+            }
+            break;
+        case 3:
+            if (CLKstate && DTstate) {  // Both CLK and DT now high as the encoder completes one step clockwise
+                encoder_state = 0;
+                ++encoder_value;
+            }
+            break;
+        // Anticlockwise rotation
+        case 4:                         // As for clockwise but with CLK and DT reversed
+            if (!CLKstate) {
+                encoder_state = 5;
+            }
+            break;
+        case 5:
+            if (DTstate) {
+                encoder_state = 6;
+            }
+            break;
+        case 6:
+            if (CLKstate && DTstate) {
+                encoder_state = 0;
+                --encoder_value;
+            }
+            break; 
+    }
+
+}
+
+/*
+MotorController::MotorController(
+    int enca_pin,
+    int encb_pin,
+    int motor_a_pin,
+    int motor_b_pin,
+    IsrSlotNumber slot_num
+    ) {
+    
+    this->enca_pin = enca_pin;
+    this->encb_pin = encb_pin;
+    this->motor_a_pin = motor_a_pin;
+    this->motor_b_pin = motor_b_pin;
+
+    this->has_began = false;
+    
+    this->slot_num = slot_num;
+
+    motor_pid = PIDControllerF_construct(
+        ANALOG_MIN,
+        ANALOG_MAX,
+        -ANALOG_MAX,
+        0.2, //p
+        0.2, //i
+        0.2 //d
+    );
+
+    //set proper ISR
+    switch(slot_num) {
+        case IsrSlotZero: {
+            this_0 = this;
+            attachInterrupt(enca_pin, isr_0, CHANGE);
+            attachInterrupt(encb_pin, isr_0, CHANGE);
+            break;
+        }
+        case IsrSlotOne: {
+            this_1 = this;
+            attachInterrupt(enca_pin, isr_0, CHANGE);
+            attachInterrupt(encb_pin, isr_0, CHANGE);
+            break;
+        }
+    }
+
+}
+*/
+
+Apple::Apple() {
+
+}
+
+
+Apple::~Apple() {
+    PIDControllerF_destruct(motor_pid);
+
+    detachInterrupt(enca_pin);
+    detachInterrupt(encb_pin);
+
+    // switch(slot_num) {
+    //     case IsrSlotZero: {
+    //         this_0 = this;
+    //         detachInterrupt(enca_pin);
+    //         detachInterrupt(encb_pin);
+    //         break;
+    //     }
+    //     case IsrSlotOne: {
+    //         this_1 = this;
+    //         attachInterrupt(enca_pin, isr_0, CHANGE);
+    //         attachInterrupt(encb_pin, isr_0, CHANGE);
+    //         break;
+    //     }
+    // }
+}
+
+void Apple::begin() {
+    //set up IO
+    pinMode(motor_a_pin, OUTPUT);
+    pinMode(motor_b_pin, OUTPUT);
+    pinMode(enca_pin, INPUT);
+    pinMode(encb_pin, INPUT);
+
+    analogWrite(motor_a_pin, ANALOG_MIN);
+    analogWrite(motor_b_pin, ANALOG_MIN);
+
+
+    has_began = true;
+
+}
+
+
+float Apple::tick(int target_speed, bool is_disabled, bool direct_speed_map) {
+
+    //inputs
+    //int target_speed = 0; //raw controller speed (from NORMAL_MIN to NORMAL_MAX)
+    //bool is_disabled = false; //true when the main robot disables the motor controller
+
+    //true when the input speed should be mapped directly to the motors
+    //can be used if the PID breaks or something
+    //bool direct_speed_map = false;
+
+
+
+    //must have initialized and be enabled
+    if(!has_began || is_disabled) {
+        return 0.0;
+    }
+
+
+
+
+    //note: this may not be used, depending on stability (with my nerf blaster, using a non-constant for this resulted in trouble)
+    int milliss = millis();
+
+    //do not run if no time has elapsed
+    // if(milliss == last_millist) {
+    //     return 0.0;
+    // }
+
+    //turn raw controller input into a target RPM speed for the motor
+    //note: 200 ticks per rotation
+
+    //get current RPM (may be less than one per tick)
+    float curr_rpm = 0.0;
+    {
+        int delta_ticks = motor_tick_ct - last_motor_tick_ct;
+        float tick_fraction = 0.0;
+
+        if(delta_ticks) {
+            time_since_motor_tick = 0;
+            tick_fraction = delta_ticks;
+        } else {
+            time_since_motor_tick++;
+            tick_fraction = 1.0 / ((float)time_since_motor_tick);
+        }
+
+        //tick_fraction is the number of ticks we have since the last time checked
+
+        float minutes_elapsed = ((float)(milliss - 0) * 0.001 * 0.016666);
+        float rpm = tick_fraction / minutes_elapsed;
+
+        curr_rpm = tick_fraction;
+        last_motor_tick_ct = motor_tick_ct;
+    }
+    
+
+    if(direct_speed_map) {
+        motor_output = map(target_speed, NORMAL_MIN, NORMAL_MAX, -ANALOG_MAX, ANALOG_MAX);
+    } else {
+
+        int mapped_target_speed = rpm_to_ticks(map(target_speed, NORMAL_MIN, NORMAL_MAX, -100, 100));
+        PIDControllerF_tick(motor_pid, FLOAT_TO_FIXED32(curr_rpm), INT_TO_FIXED32(mapped_target_speed), 200); //feeding constant time step of 200 into the PID
+    }
+
+
+
+    //last_millist = milliss;
+
+    return curr_rpm;
+
+}
+
+
+
+
+
+
+

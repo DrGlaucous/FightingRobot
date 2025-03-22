@@ -1,0 +1,48 @@
+
+#include "Apple.h"
+
+
+int rpm_to_ticks(int rpm) {
+    return rpm * 200;
+}
+
+void MotorController::isr_handler() {
+
+}
+
+
+MotorController::MotorController(
+    int enca_pin,
+    int encb_pin,
+    int motor_a_pin,
+    int motor_b_pin,
+    IsrSlotNumber sl
+    ) {
+
+}
+
+
+MotorController::~MotorController() {
+
+
+}
+
+
+
+
+void MotorController::begin() {
+
+}
+
+
+float MotorController::tick(int target_speed, bool is_disabled, bool direct_speed_map) {
+    return 0.0;
+}
+
+
+
+
+
+
+
+
