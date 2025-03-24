@@ -8,9 +8,17 @@
 #include "Controller.h"
 #include "ESPRadio.h"
 #include "configuration.h"
+#include "MotorController.h"
 #include "Robot.h"
 
-
+int clamp(int in, int min, int max) {
+    if(in > max) {
+        in = max;
+    } else if(in < min) {
+        in = min;
+    }
+    return in;
+}
 
 float mapf(float x, float in_min, float in_max, float out_min, float out_max) {
     const float run = in_max - in_min;
@@ -46,15 +54,30 @@ RobotHandler::RobotHandler()
 
 
     //for motors
-    pinMode(MOTOR_1A_PIN, OUTPUT);
-    pinMode(MOTOR_1B_PIN, OUTPUT);
+    motor_r = new MotorController(
+        MOTOR_1_ENCA,
+        MOTOR_1_ENCB,
+        MOTOR_1A_PIN,
+        MOTOR_1B_PIN,
+        IsrSlotZero
+    );
+    motor_l = new MotorController(
+        MOTOR_2_ENCB,
+        MOTOR_2_ENCA,
+        MOTOR_2B_PIN,
+        MOTOR_2A_PIN,
+        IsrSlotOne
+    );
 
-    pinMode(MOTOR_2A_PIN, OUTPUT);
-    pinMode(MOTOR_2B_PIN, OUTPUT);
+    motor_r->begin();
+    motor_l->begin();
 
+    //motor sleep mode
     pinMode(MOTOR_SLEEP_PIN, OUTPUT);
+    
+    //start with robot disabled
+    is_enabled = false;
 
-    pause();
 
 }
 
@@ -62,102 +85,69 @@ RobotHandler::RobotHandler()
 RobotHandler::~RobotHandler()
 {
     delete(radio);
-    //delete(blinker);
+    delete(esc);
+
+    delete(motor_r);
+    delete(motor_l);
+
 }
 
 
 void RobotHandler::update()
 {
 
-    //pulse test
-    // blinker->update();
-    // if(gTimer.DeltaTimeMillis(&last_time, 1000))
-    // {
-    //     blinker->blink_lt(100);
-    // }
-
-    //does basic IO processing, good for testing
-    //TestMain();
-
 
 
     if(radio->CheckForPacket(NULL) == RX_SUCCESS)
     {
-        Serial.println("Got packet");
+        //Serial.println("Got packet");
 
-        //take rx packets and format them for each application
-        MapControllerData();
+        //take rx packets and format them for internal variables
+        MapControllerData();        
 
-        //check for remote halt
-        if(remote_disable)
-            pause();
-        else
-            resume();
 
     }
     else if(radio->GetDeltaTime() > KEEPALIVE_TIMEOUT_MS)
     {
         //signal loss estop
-        pause();
+        is_enabled = false;
     }
+
 
 
     //send back information about the robot on regular intervals
     SendTelemetry();
 
-    //do the omniwheel math
-    SetWheelSpeedProportions();
-
 
     //estop enabled, don't execute any physical functions
-    if(!is_enabled)
+    if(!is_enabled) {
+        digitalWrite(MOTOR_SLEEP_PIN, LOW); //HIGH == enable
         return;
+    } else {
+        digitalWrite(MOTOR_SLEEP_PIN, HIGH); //HIGH == enable
 
-    //analogWrite to each motor driver
-    WriteMotors();
+        motor_l->tick(motor_left_speed, false, direct_map_motors);
+        motor_r->tick(motor_right_speed, false, direct_map_motors);
+
+
+        //write ESC (we could also do this in an ISR, but...)
+        auto delta_millis = millis() - last_esc_time;
+        if(delta_millis > 2)
+        {
+            esc->send_dshot_value(esc_speed);
+            auto error_t = esc->get_dshot_packet(&esc_rpm_telem);
+
+            last_esc_time = millis();
+        }
+
+    }
+
 
     //DumpChannelPacket();
 
 }
 
 
-void RobotHandler::pause()
-{
-    if(!is_enabled)
-        return;
-    
-    is_enabled = false;
-
-
-    //disable wheelbase
-    digitalWrite(MOTOR_SLEEP_PIN, LOW);
-
-    //no need to disable ESC: simply not writing to it will disable it (esp32)
-
-    Serial.println("Paused!");
-
-    //just in case a re-enable signal comes in, (or the timer overflows), the robot will not lurch suddenly
-
-
-    esc_set_speed = ESC_SPEED_MIN_R;
-
-}
-
-
-void RobotHandler::resume()
-{
-    if(is_enabled)
-        return;
-
-    is_enabled = true;
-
-
-
-    //enable wheelbase
-    digitalWrite(MOTOR_SLEEP_PIN, HIGH);
-
-    Serial.println("Resumed!");
-}
 
 
 void RobotHandler::DumpChannelPacket()
@@ -183,102 +173,54 @@ void RobotHandler::DumpMappedPacket()
 
 }
 
+void RobotHandler::MapControllerData() {
 
-void RobotHandler::MapControllerData()
-{
-    auto gotten_data = radio->GetLastControlPacket().channels;
+    //get most recent RX packet
+    auto packet = radio->GetLastControlPacket();
+
+    //set ESC speed
+    esc_speed = map(packet.channels.analog_channels[VERTICAL_LEFT], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_R, ESC_SPEED_MAX_R);
+    //disable for now
+    //esc_speed = DSHOT_THROTTLE_MIN;
+
+    //determine motor PID enabled
+    direct_map_motors = !!packet.channels.digital_channels[6];
+
+    //determine enabled state
+    is_enabled = packet.channels.digital_channels[5];
+
+
+    //change map range bsed on mode
+    auto motor_speed_min = direct_map_motors? -ANALOG_MAX : -MOTOR_RPM_MAX;
+    auto motor_speed_max = direct_map_motors? ANALOG_MAX : MOTOR_RPM_MAX;
+
+    //get and normalize the values between our map range
+    auto turn_value = map(packet.channels.analog_channels[HORIZONTAL_RIGHT], NORMAL_MAX, NORMAL_MIN, motor_speed_min, motor_speed_max);
+    auto straight_value = map(packet.channels.analog_channels[VERTICAL_RIGHT], NORMAL_MAX, NORMAL_MIN, motor_speed_min, motor_speed_max);
+
+    //forward values for each motor (crop values less than 5 for stability)
+    auto motor_l_forward = abs(straight_value) < 5 ? 0 : straight_value;
+    auto motor_r_forward = abs(straight_value) < 5 ? 0 : straight_value;
+
+
+
+    //turn value is from 0 to 512, we will forward-map R and reverse map L
+    auto motor_l_turn = map(turn_value, motor_speed_min, motor_speed_max, motor_speed_max, motor_speed_min);
+    auto motor_r_turn = turn_value;
+
     
-    // if(gotten_data.analog_channels[TURN_IN] > 300 || gotten_data.analog_channels[TURN_IN] < 240)
-    // {
-    //     Serial.println(gotten_data.analog_channels[TURN_IN]);
-    // }
+    // auto mlf = abs(motor_l_forward);
+    // auto mlt = abs(motor_l_turn);
+    // motor_left_speed = (mlf > mlt) ? motor_l_forward : motor_l_turn;
 
-    
-
-    //gotten_data.digital_channels[FLIPOVER_IN]
-    //gotten_data.analog_channels[ESC_IN]
-
-
-    left = map(gotten_data.analog_channels[VERTICAL_LEFT], NORMAL_MIN, NORMAL_MAX, -MOTOR_RPM_MAX, MOTOR_RPM_MAX);
-    right = map(gotten_data.analog_channels[HORIZONTAL_LEFT], NORMAL_MIN, NORMAL_MAX, -MOTOR_RPM_MAX, MOTOR_RPM_MAX);
-
-    //do non-linear rotation mapping
-    //rot_m = map(gotten_data.analog_channels[HORIZONTAL_RIGHT], NORMAL_MIN, NORMAL_MAX, MOTOR_RPM_MAX, -MOTOR_RPM_MAX);
-
-    //float degrees = mapf(gotten_data.analog_channels[TUNER_RIGHT], NORMAL_MIN, NORMAL_MAX, 1.0, 5.0);
-
-    //TEST
-    //temp_servo2_min = map(gotten_data.analog_channels[TURN_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, SERVO_2_MS_MAX - 100, SERVO_2_MS_MAX + 100);
-    //temp_servo2_max = map(gotten_data.analog_channels[MOTOR_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, SERVO_2_MS_MIN - 100, SERVO_2_MS_MIN + 100);
+    // auto mrf = abs(motor_r_forward);
+    // auto mrt = abs(motor_r_turn);
+    // motor_right_speed = (mrf > mrt) ? motor_r_forward : motor_r_turn;
+    // Serial.printf("MLF: %d, MLT: %d FINAL: %d|| MRF: %d, MRT: %d FINAL: %d\n", mlf, mlt, motor_left_speed, mrf, mrt, motor_right_speed);
 
 
-
-    //we may want to use exponential mapping for this instead to get the finer values
-    //ramp_tune = mapf(gotten_data.analog_channels[MOTOR_RAMP_TUNE], NORMAL_MIN, NORMAL_MAX, 0.0, 3.0);
-
-    //is_flipped_over = gotten_data.digital_channels[FLIPOVER_IN] < 1;
-    //is_two_wheeled = gotten_data.digital_channels[TWO_MODE_IN] > 1;
-    //broken_wheel = gotten_data.digital_channels[TWO_SELECT_IN];
-    //remote_disable = gotten_data.digital_channels[MASTER_ENABLE] == 2;
-
-    //esc_reversed = gotten_data.digital_channels[ESC_REVERSE_IN];
-
-    //from the back right lever, controls how far the servo arm will rotoate with the stick (0-180)
-    //servo_angle_min = map(gotten_data.analog_channels[SERVO_MIN_IN], NORMAL_MAX, NORMAL_MIN, SERVO_MIN, SERVO_MAX);
-
-    //reverse mapping (for servo) happens later (because both servos take different values)
-    //servo_angle = map(gotten_data.analog_channels[SERVO_IN], NORMAL_MAX, NORMAL_MIN, servo_angle_min, SERVO_MAX);
-
-
-    //handles reverse mapping (for ESC)
-    //esc_set_speed = esc_reversed == 1 ? DSHOT_CMD_MOTOR_STOP : 
-    //(!!is_flipped_over ^ !!esc_reversed) ? 
-    //map(gotten_data.analog_channels[VERTICAL_RIGHT], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_F, ESC_SPEED_MAX_F):
-    //map(gotten_data.analog_channels[VERTICAL_RIGHT], NORMAL_MAX, NORMAL_MIN, ESC_SPEED_MIN_R, ESC_SPEED_MAX_R);
-
-
-}
-
-
-void RobotHandler::SetWheelSpeedProportions()
-{
-    //Serial.printf("XM: %d\tYM %d\n", xm, ym);
-    //xm = 0;
-    //ym = XY_RADIUS;
-    //rot_m = 0;
-
-}
-
-
-void RobotHandler::WriteMotors()
-{
-    //write drivebase
-    analogWrite(MOTOR_1A_PIN, mot1 < 0? 0: mot1);
-    analogWrite(MOTOR_1B_PIN, mot1 < 0? -mot1: 0);
-
-    analogWrite(MOTOR_2A_PIN, mot2 < 0? 0: mot2);
-    analogWrite(MOTOR_2B_PIN, mot2 < 0? -mot2: 0);
-
-    //Serial.printf("left: %d\n", left);
-
-    // //write servos (using degrees)
-    // auto mirrored_servo_angle = SERVO_MAX - servo_angle;
-    // int16_t demapped_1 = map(is_flipped_over? mirrored_servo_angle : servo_angle, SERVO_MIN, SERVO_MAX, SERVO_1_MS_MIN, SERVO_1_MS_MAX);
-    // int16_t demapped_2 = map(is_flipped_over? servo_angle : mirrored_servo_angle, SERVO_MIN, SERVO_MAX, SERVO_2_MS_MIN, SERVO_2_MS_MAX);
-    // servo_1->write(demapped_1);
-    // servo_2->write(demapped_2);
-
-    // //Serial.printf("S1: %d S2: %d\n", demapped_1, demapped_2);
-    // //Serial.printf("S1: %5d S2: %5d || M2Min: %5d :: M2Max %5d\n", servo_1->readMicroseconds(), servo_2->readMicroseconds(), temp_servo2_min, temp_servo2_max);
-
-    // //write ESC
-    // if(TimerHandler::DeltaTimeMillis(&last_esc_time, 2))
-    // {
-    //     esc->send_dshot_value(esc_set_speed);
-    //     uint32_t aa = 0;
-    //     auto error_t = esc->get_dshot_packet(&aa);
-    //     esc_get_speed = aa;
-    // }
+    motor_left_speed = clamp(motor_l_forward + motor_l_turn, motor_speed_min, motor_speed_max);
+    motor_right_speed = clamp(motor_r_forward + motor_r_turn, motor_speed_min, motor_speed_max);
 
 
 }
@@ -292,23 +234,10 @@ void RobotHandler::SendTelemetry()
     {
         remote_ack_packet_t outbox = {};
         outbox.battery_voltage = 0.0;
-        outbox.motor_rpm = esc_get_speed;
+        outbox.motor_rpm = esc_rpm_telem;
         radio->SendPacket(outbox);
     }
 
 }
 
 
-void RobotHandler::TestMain()
-{
-
-    //send telemetry back on a regular interval
-    SendTelemetry();
-
-    if(radio->CheckForPacket(NULL) == RX_SUCCESS)
-    {
-        //auto commands = radio->GetLastControlPacket();
-        DumpChannelPacket();
-        //Serial.printf("%d || %d ||-|| %d || %d\n", commands.channels.analog_channels[2], commands.channels.analog_channels[3], commands.channels.digital_channels[0], commands.channels.digital_channels[1]);
-    }
-}

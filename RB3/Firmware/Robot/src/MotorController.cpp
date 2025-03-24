@@ -1,16 +1,20 @@
 #include <Arduino.h>
 #include <math.h>
 #include "configuration.h"
-#include "PidController.h"
+#include "PidControllerF.h"
 #include "MotorController.h"
 
 
+int rpm_to_ticks(int rpm) {
+    return rpm * 200;
+}
+
 
 static void isr_0();
-static Apple* this_0;
+static MotorController* this_0;
 
 static void isr_1();
-static Apple* this_1;
+static MotorController* this_1;
 
 
 void isr_0() {
@@ -21,7 +25,7 @@ void isr_1() {
 }
 
 
-void Apple::isr_handler() {
+void MotorController::isr_handler() {
     
 
 
@@ -50,7 +54,7 @@ void Apple::isr_handler() {
         case 3:
             if (CLKstate && DTstate) {  // Both CLK and DT now high as the encoder completes one step clockwise
                 encoder_state = 0;
-                ++encoder_value;
+                ++motor_tick_ct;
             }
             break;
         // Anticlockwise rotation
@@ -67,14 +71,14 @@ void Apple::isr_handler() {
         case 6:
             if (CLKstate && DTstate) {
                 encoder_state = 0;
-                --encoder_value;
+                --motor_tick_ct;
             }
             break; 
     }
 
 }
 
-/*
+
 MotorController::MotorController(
     int enca_pin,
     int encb_pin,
@@ -92,13 +96,13 @@ MotorController::MotorController(
     
     this->slot_num = slot_num;
 
-    motor_pid = PIDControllerF_construct(
+    motor_pid = new PIDController(
         ANALOG_MIN,
         ANALOG_MAX,
         -ANALOG_MAX,
-        0.2, //p
-        0.2, //i
-        0.2 //d
+        0.0012, //p
+        0.00001, //i
+        0.01 //d
     );
 
     //set proper ISR
@@ -111,22 +115,22 @@ MotorController::MotorController(
         }
         case IsrSlotOne: {
             this_1 = this;
-            attachInterrupt(enca_pin, isr_0, CHANGE);
-            attachInterrupt(encb_pin, isr_0, CHANGE);
+            attachInterrupt(enca_pin, isr_1, CHANGE);
+            attachInterrupt(encb_pin, isr_1, CHANGE);
             break;
         }
     }
 
 }
-*/
-
-Apple::Apple() {
-
-}
 
 
-Apple::~Apple() {
-    PIDControllerF_destruct(motor_pid);
+
+
+
+MotorController::~MotorController() {
+
+    delete(motor_pid);
+    //PIDControllerF_destruct(motor_pid);
 
     detachInterrupt(enca_pin);
     detachInterrupt(encb_pin);
@@ -147,7 +151,7 @@ Apple::~Apple() {
     // }
 }
 
-void Apple::begin() {
+void MotorController::begin() {
     //set up IO
     pinMode(motor_a_pin, OUTPUT);
     pinMode(motor_b_pin, OUTPUT);
@@ -158,12 +162,13 @@ void Apple::begin() {
     analogWrite(motor_b_pin, ANALOG_MIN);
 
 
+
     has_began = true;
 
 }
 
-
-float Apple::tick(int target_speed, bool is_disabled, bool direct_speed_map) {
+//target speed should be an RPM, if in direct mode, it is clamped between -ANALOG_MAX and ANALOG_MAX (255)
+void MotorController::tick(int target_speed, bool is_disabled, bool direct_speed_map) {
 
     //inputs
     //int target_speed = 0; //raw controller speed (from NORMAL_MIN to NORMAL_MAX)
@@ -177,66 +182,103 @@ float Apple::tick(int target_speed, bool is_disabled, bool direct_speed_map) {
 
     //must have initialized and be enabled
     if(!has_began || is_disabled) {
-        return 0.0;
+        return;
     }
 
-
-
-
-    //note: this may not be used, depending on stability (with my nerf blaster, using a non-constant for this resulted in trouble)
-    int milliss = millis();
-
-    //do not run if no time has elapsed
-    // if(milliss == last_millist) {
-    //     return 0.0;
-    // }
 
     //turn raw controller input into a target RPM speed for the motor
     //note: 200 ticks per rotation
 
-    //get current RPM (may be less than one per tick)
-    float curr_rpm = 0.0;
+    //get current RPM (may be less than one per tick) (note: does not update when motor is stalled!!)
+    uint32_t microseconds = micros();
+    uint32_t delta_micros = microseconds - last_micros;
+    if(motor_tick_ct != last_motor_tick_ct || delta_micros > 100000)
     {
-        int delta_ticks = motor_tick_ct - last_motor_tick_ct;
-        float tick_fraction = 0.0;
+        // //store latest value
+        // tick_history[tick_history_index] = motor_tick_ct - last_motor_tick_ct;
+        // tick_history_index++;
+        // tick_history_index %= HISTORY_COUNT;
+        // //average all values
+        // int history_sum = 0;
+        // for(int i = 0; i < HISTORY_COUNT; ++i) {
+        //     history_sum += tick_history[i];
+        // }
+        
+        //convert to RPM
+        float minutes_elapsed = ((float)(delta_micros) * 0.000001 * 0.016666);
+        float rpm = (float)(motor_tick_ct - last_motor_tick_ct) / (minutes_elapsed * 200);
 
-        if(delta_ticks) {
+        last_motor_tick_ct = motor_tick_ct;
+        last_micros = microseconds;
+        current_rpm = rpm;
+    }
+
+
+    //only update speed on time change
+    /*
+    if(milliss != last_millis)
+    {
+        int delta_tickss = motor_tick_ct - last_motor_tick_ct;
+
+        if(delta_tickss) {
             time_since_motor_tick = 0;
-            tick_fraction = delta_ticks;
+            dta_ticks = delta_tickss;
         } else {
             time_since_motor_tick++;
-            tick_fraction = 1.0 / ((float)time_since_motor_tick);
+            dta_ticks = dta_ticks / ((float)time_since_motor_tick);
         }
 
         //tick_fraction is the number of ticks we have since the last time checked
 
-        float minutes_elapsed = ((float)(milliss - 0) * 0.001 * 0.016666);
-        float rpm = tick_fraction / minutes_elapsed;
+        float minutes_elapsed = ((float)(milliss - last_millis) * 0.001 * 0.016666);
+        float rpm = dta_ticks / minutes_elapsed;
 
-        curr_rpm = tick_fraction;
+        current_rpm = rpm;
         last_motor_tick_ct = motor_tick_ct;
     }
-    
+    */
 
+
+
+
+
+    //run PID or not
     if(direct_speed_map) {
-        motor_output = map(target_speed, NORMAL_MIN, NORMAL_MAX, -ANALOG_MAX, ANALOG_MAX);
+        if(target_speed > ANALOG_MAX) {
+            target_speed = ANALOG_MAX;
+        } else if(target_speed < -ANALOG_MAX) {
+            target_speed = -ANALOG_MAX;
+        }
+        motor_output = target_speed;
     } else {
+        //int mapped_target_speed = rpm_to_ticks(target_speed); //(map(target_speed, NORMAL_MIN, NORMAL_MAX, -100, 100));
+        //motor_output = PIDControllerF_tick(motor_pid, INT_TO_FIXED32(mapped_target_speed), FLOAT_TO_FIXED32(current_rpm), 200); //feeding constant time step of 200 into the PID
+        //int mapped_target_speed = map(target_speed, -0xFF, 0xFF, -MOTOR_RPM_MAX, MOTOR_RPM_MAX);
+        
 
-        int mapped_target_speed = rpm_to_ticks(map(target_speed, NORMAL_MIN, NORMAL_MAX, -100, 100));
-        PIDControllerF_tick(motor_pid, FLOAT_TO_FIXED32(curr_rpm), INT_TO_FIXED32(mapped_target_speed), 200); //feeding constant time step of 200 into the PID
+        motor_output = motor_pid->tick(target_speed, current_rpm, 200);
+
+        //Serial.printf("RPM: %8.3f || Target: %d || motor_output: %d\n", current_rpm, target_speed, motor_output);
+
     }
 
+    //Serial.printf("RPM: %8.3f\n", current_rpm);
 
 
-    //last_millist = milliss;
-
-    return curr_rpm;
+    write_motors();
+    
+    return;
 
 }
 
 
 
+void MotorController::write_motors() {
 
+    analogWrite(motor_a_pin, motor_output < 0? 0: motor_output);
+    analogWrite(motor_b_pin, motor_output < 0? -motor_output: 0);
+
+}
 
 
 

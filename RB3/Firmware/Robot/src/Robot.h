@@ -1,13 +1,14 @@
 #pragma once
 #include <Arduino.h>
+#include <ESP32Servo.h>
+#include <DShotRMT.h>
 
 #include "Controller.h"
 #include "ESPRadio.h"
 #include "configuration.h"
 #include "TimerTick.h"
+#include "MotorController.h"
 
-#include <ESP32Servo.h>
-#include <DShotRMT.h>
 
 
 
@@ -274,143 +275,6 @@ private:
 
 };
 
-class PIDController {
-
-    public:
-
-    PIDController(
-        int32_t start_output_offset = DSHOT_THROTTLE_MIN,
-        int32_t max_lim = DSHOT_THROTTLE_MAX,
-        int32_t min_lim = DSHOT_THROTTLE_MIN,
-        float p_const = 0.2,
-        float i_const = 0.2,
-        float d_const = 0.2
-    ) {
-        if(start_output_offset > max_lim)
-            start_output_offset = max_lim;
-
-        this->start_output_offset = start_output_offset;
-        this->max_lim = max_lim;
-        this->min_lim = min_lim;
-
-        this->p_const = p_const;
-        this->i_const = i_const;
-        this->d_const = d_const;
-
-    };
-
-    ~PIDController() {
-    };
-
-    //runs the pid loop for one cycle (uses floats, non-ISR-safe)
-    int32_t tick(uint32_t target_rpm, uint32_t curr_rpm, uint32_t delta_micros) {
-
-        //small RPM = big throttle value, direct acting
-
-        //delta_micros = 200; //for testing
-
-        //determine PID values
-
-        float pval = (float)target_rpm - (float)curr_rpm;
-
-        //if our value is increasing/decreasing and we limited the output, don't continue integration
-        //or if our current value is 0 (rely only on P control for startup)
-        if(
-            !(
-            (pval > 0.0 && has_limited_high) ||
-            (pval < 0.0 && has_limited_low)
-            )
-            && curr_rpm != 0
-        ) {
-            ival += pval * i_const * (float)delta_micros;
-        }
-
-        float dval = pval - last_pval;
-        last_pval = pval;
-
-        //sum and multiply by constants
-        int32_t pid_out = (int32_t)(
-            pval * p_const * (float)delta_micros
-            + ival //integral constant is applied above
-            + dval * d_const * (float)delta_micros
-        ) + start_output_offset;
-
-        //limit output
-        if(pid_out > max_lim) {
-            pid_out = max_lim;
-            has_limited_high = true;
-            has_limited_low = false;
-        } else if (pid_out < min_lim) {
-            pid_out = min_lim;
-            has_limited_high = false;
-            has_limited_low = true;
-        } else {
-            has_limited_high = false;
-            has_limited_low = false;
-        }
-
-        return(pid_out);
-    
-    }
-
-    //called whenever we take manual control of the loop, resets persistent I and D values
-    void reset() {
-        last_pval = 0;
-        ival = 0;
-        has_limited_high = false;
-        has_limited_low = false;
-    }
-
-    //controls what extra value will be added to the loop, typically for starting at "full throttle"
-    void set_output_offset(int32_t offset) {
-        if(offset < min_lim) {
-            start_output_offset = min_lim;
-        } else if(offset > max_lim) {
-            start_output_offset = max_lim;
-        } else {
-            start_output_offset = offset;
-        }
-    }
-
-
-    int32_t test(uint32_t target_rpm, uint32_t curr_rpm, uint32_t delta_micros) {
-
-
-        Serial.printf("A TEST %d\n", target_rpm);
-
-        float pval = (float)target_rpm;
-
-        //test
-        Serial.printf("==%f==1\n", pval);
-        pval = 2.0;
-        
-        Serial.printf("==%f==2\n", pval);
-        return 0;
-    }
-
-
-    private:
-
-    //vars
-    float p_const = 0.0;
-    float i_const = 0.0;
-    float d_const = 0.0;
-
-    //data retainers
-    float last_pval = 0;
-    float ival = 0;
-
-    int32_t max_lim = DSHOT_THROTTLE_MAX;
-    int32_t min_lim = DSHOT_THROTTLE_MIN;
-
-    int32_t start_output_offset = 0;
-
-
-    bool has_limited_high = false;
-    bool has_limited_low = false;
-
-};
-
 
 
 //does all the roboty things (like movement, weapon handling, etc.)
@@ -424,66 +288,50 @@ class RobotHandler
 
     void update();
 
-    //disable everything (emergency kill mode when no transmitter packets are recieved)
-    void pause();
-
-    //re-enable everything
-    void resume();
-
     private:
 
-    //we know this works, so use it for testing radio rx and tx
-    void TestMain();
-
+    void MapControllerData();
     void SendTelemetry();
 
     //for sending out telemetry packets
     unsigned long last_time = 0;
-
     //used to update the ESC output (only in dshot mode)
     unsigned long last_esc_time = 0;
 
+
     RadioNowHandler* radio;
-    BlinkerHandler* blinker;
 
 
     DShotRMT* esc;
+    MotorController* motor_l;
+    MotorController* motor_r;
 
 
     //last packet read from the radio
-    //concatated_channels_t gotten_data = {};
+    concatated_channels_t gotten_data = {};
     
     //wheelbase vectors left side and right side
-    int16_t left, right {};
+    //should be a raw value from NORMAL_MIN to NORMAL_MAX, mapping is handled in the MotorController class
+    int16_t motor_left_speed, motor_right_speed {};
+    bool direct_map_motors = false;
 
-    //actual motor output (from PID)
-    int16_t mot1, mot2 = {};
+
+    //fan speed (should be a value form DSHOT_THROTTLE_MIN to DSHOT_THROTTLE_MAX)
+    uint16_t esc_speed {};
+    uint32_t esc_rpm_telem {};
 
 
-    //weapon location and speed
-
-    uint16_t esc_get_speed = 0;
-    uint16_t esc_set_speed = 0;
-
-    //remote disable
-    bool remote_disable = false;
-    //current enable state
+    //enables/disables weapon and drivetrain
     bool is_enabled = false;
 
 
-    //put rx data into each specific variable
-    void MapControllerData();
 
-    //write processed data to each output
-    void SetWheelSpeedProportions();
-    void WriteMotors();
+
 
     //test: dump channels to serial monitor
     void DumpChannelPacket();
     //dump processed cahnnels to serial moditor
     void DumpMappedPacket();
-
-
 
 };
 

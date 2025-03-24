@@ -78,6 +78,7 @@
 //////////////control surface mapping
 //these are not directly used by the transmitter, but are the indexes of the transmitter packet that we use to check for this stuff
 
+#ifdef FIXED_TRANSMITTER
 #define VERTICAL_LEFT 3
 #define HORIZONTAL_LEFT 4
 #define VERTICAL_RIGHT 2
@@ -87,6 +88,7 @@
 #define TUNER_LEFT 7
 #define TUNER_RIGHT 8
 
+//todo: these mappings are wrong
 #define DIG_SA 1
 #define DIG_POI 2
 #define DIG_SC 3
@@ -95,12 +97,50 @@
 #define DIG_SF 6
 #define DIG_DRRUD 7
 #define DIG_SH 8
+#else
 
+#define VERTICAL_RIGHT 1
+#define HORIZONTAL_RIGHT 0
+#define VERTICAL_LEFT 2
+#define HORIZONTAL_LEFT 3
+#define PADDLE_LEFT 4
+#define PADDLE_RIGHT 5
+#define TUNER_LEFT 6
+#define TUNER_RIGHT 7
+
+#define DIG_SA 0
+#define DIG_POI 1
+#define DIG_SC 2
+#define DIG_FS 3
+#define DIG_ATT 4
+#define DIG_SF 5
+#define DIG_DRRUD 6
+#define DIG_SH 7
+
+#endif
+
+
+// //analog
+// #define X_IN 0
+// #define Y_IN 1
+// #define TURN_IN 3
+// #define SERVO_IN 2
+// #define ESC_IN 4
+// #define SERVO_MIN_IN 5
+// #define TURN_RAMP_TUNE 6
+// #define MOTOR_RAMP_TUNE 7
+
+// //digital
+// #define FLIPOVER_IN 1//5
+// #define ESC_REVERSE_IN 0//4
+// #define TWO_MODE_IN 7
+// #define TWO_SELECT_IN 6
+// #define MASTER_ENABLE 2
 
 ////////////////////normalization
 
 //the max speed of the motor in both directions
-#define MOTOR_RPM_MAX 600
+#define MOTOR_RPM_MAX 400
 
 
 //analog servos have slightly different values that are mapped from the normalized range

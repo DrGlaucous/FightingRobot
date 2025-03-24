@@ -1,15 +1,24 @@
 #pragma once
 
+#include <Arduino.h>
+#include "PidControllerF.h"
+#include "PidController.h"
 
 #define ANALOG_MAX 255
 #define ANALOG_MIN 0
 
+#define HISTORY_COUNT 64
 
 typedef enum IsrSlotNumber {
     IsrSlotZero,
     IsrSlotOne
 }IsrSlotNumber;
 
+typedef struct OutPacket {
+    float rpm;
+    int motor_tick_ct;
+    int motor_output;
+}OutPacket;
 
 class MotorController{
     
@@ -29,11 +38,13 @@ class MotorController{
 
     void begin();
 
-    float tick(int target_speed, bool is_disabled, bool direct_speed_map);
+    void tick(int target_speed, bool is_disabled, bool direct_speed_map);
 
     void isr_handler();
 
     private:
+
+    void write_motors();
 
     int enca_pin = -1;
     int encb_pin = -1;
@@ -44,18 +55,24 @@ class MotorController{
     int motor_output = 0; //value to be written to the motor (result of the PID or direct mapping)
     bool has_began = false;
 
-    int last_millis = 0;
     int motor_tick_ct = 0; //holds raw absolute position of the motor
     int last_motor_tick_ct = 0; //for delta ticks
     int time_since_motor_tick = 0; //holds the number of cycles since the last encoder change interrupt
 
+    float dta_ticks = 0.0;
+    float current_rpm = 0.0;
 
-    // uint8_t encoder_state = 0;
 
-    // PIDControllerF* motor_pid = NULL;
-    // IsrSlotNumber slot_num = IsrSlotOne; //keep track of this for removing ISR on destruct
-    // int32_t encoder_value = 0;
+    uint8_t encoder_state = 0; //state machine for getting encoder number
 
+    PIDController* motor_pid = NULL;
+    IsrSlotNumber slot_num = IsrSlotOne; //keep track of this for removing ISR on destruct
+
+
+    //hold HISTORY_COUNT worth of delta ticks
+    int8_t tick_history[HISTORY_COUNT];
+    int tick_history_index = 0;
+    uint32_t last_micros = 0;
 
 
     // // //isrs (one for each instance of the class we can run)
