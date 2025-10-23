@@ -7,14 +7,18 @@
 
 
 //decimal ct.
-#define Q32_SCALE 16
+#define Q32_SCALE 17
 
 //operations
 #define FIXED32_NEG(a) ((~a)+1)
-#define FIXED32_ADD(a, b) (((a) + (b)) >> Q32_SCALE)
+#define FIXED32_ADD(a, b) ((a) + (b))
 #define FIXED32_SUB(a, b) ((a) + FIXED32_NEG(b))
+//#define FIXED32_MUL(a, b) (((a) * (b)) >> Q32_SCALE)
+//#define FIXED32_DIV(a, b) (((a) << Q32_SCALE) / (b))
 #define FIXED32_MUL(a, b) (((long long)(a) * (b)) >> Q32_SCALE)
 #define FIXED32_DIV(a, b) (((long long)(a) << Q32_SCALE) / (b))
+#define FIXED32_POW2(a) (((a) * (a)) >> Q32_SCALE)
+#define FIXED32_POW3(a) (((((a) * (a)) >> Q32_SCALE)*(a)) >> Q32_SCALE)
 
 //data casting macros
 #define FLOAT_TO_FIXED32(float_val) ((int32_t)(round(float_val * (1 << Q32_SCALE))))

@@ -78,13 +78,13 @@ int32_t PIDControllerF_tick(PIDControllerF* pc, fixed32 target_rpm, fixed32 curr
     fixed32 delta_micros_f32 = INT_TO_FIXED32(delta_micros);
 
     //if our value is increasing/decreasing and we limited the output, don't continue integration
-    //or if our current value is 0 (rely only on P control for startup)
+    //or if our current value is 0 (rely only on P control for startup, only required for things that start fast. these N20s aren't that...)
     if(
         !(
         (pval > 0 && pc->has_limited_high) ||
         (pval < 0 && pc->has_limited_low)
         )
-        && curr_rpm != 0
+        //&& curr_rpm != 0
     ) {
         //ival += pval * i_const * (float)delta_micros;
 

@@ -66,6 +66,7 @@ class MotorController{
     uint8_t encoder_state = 0; //state machine for getting encoder number
 
     PIDController* motor_pid = NULL;
+    PIDControllerF* mpid_f = NULL;
     IsrSlotNumber slot_num = IsrSlotOne; //keep track of this for removing ISR on destruct
 
 

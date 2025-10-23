@@ -40,17 +40,7 @@ RobotHandler::RobotHandler()
     esc->begin(DSHOT300, ENABLE_BIDIRECTION, MOTOR_POLE_COUNT);
 
 
-    //moved to resume()
-    //servo_1->attach(SERVO_1_PIN);
-    //servo_2->attach(SERVO_2_PIN);
-
-
-
-
     radio = new RadioNowHandler();
-    //blinker = new BlinkerHandler(LED_BUILTIN);
-
-
 
 
     //for motors
@@ -198,9 +188,12 @@ void RobotHandler::MapControllerData() {
     auto turn_value = map(packet.channels.analog_channels[HORIZONTAL_RIGHT], NORMAL_MAX, NORMAL_MIN, motor_speed_min, motor_speed_max);
     auto straight_value = map(packet.channels.analog_channels[VERTICAL_RIGHT], NORMAL_MAX, NORMAL_MIN, motor_speed_min, motor_speed_max);
 
+    turn_value = (abs(turn_value) < 5) ? 0 : turn_value;
+    straight_value = (abs(straight_value) < 5) ? 0 : straight_value;
+
     //forward values for each motor (crop values less than 5 for stability)
-    auto motor_l_forward = abs(straight_value) < 5 ? 0 : straight_value;
-    auto motor_r_forward = abs(straight_value) < 5 ? 0 : straight_value;
+    auto motor_l_forward =straight_value;
+    auto motor_r_forward = straight_value;
 
 
 

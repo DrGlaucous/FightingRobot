@@ -96,7 +96,17 @@ MotorController::MotorController(
     
     this->slot_num = slot_num;
 
+    
     motor_pid = new PIDController(
+        ANALOG_MIN,
+        ANALOG_MAX,
+        -ANALOG_MAX,
+        0.0012, //p
+        0.00001, //i
+        0.01 //d
+    );
+
+    mpid_f = PIDControllerF_construct(
         ANALOG_MIN,
         ANALOG_MAX,
         -ANALOG_MAX,
@@ -130,7 +140,7 @@ MotorController::MotorController(
 MotorController::~MotorController() {
 
     delete(motor_pid);
-    //PIDControllerF_destruct(motor_pid);
+    PIDControllerF_destruct(mpid_f);
 
     detachInterrupt(enca_pin);
     detachInterrupt(encb_pin);
@@ -251,14 +261,18 @@ void MotorController::tick(int target_speed, bool is_disabled, bool direct_speed
         }
         motor_output = target_speed;
     } else {
-        //int mapped_target_speed = rpm_to_ticks(target_speed); //(map(target_speed, NORMAL_MIN, NORMAL_MAX, -100, 100));
-        //motor_output = PIDControllerF_tick(motor_pid, INT_TO_FIXED32(mapped_target_speed), FLOAT_TO_FIXED32(current_rpm), 200); //feeding constant time step of 200 into the PID
-        //int mapped_target_speed = map(target_speed, -0xFF, 0xFF, -MOTOR_RPM_MAX, MOTOR_RPM_MAX);
         
 
-        motor_output = motor_pid->tick(target_speed, current_rpm, 200);
 
-        //Serial.printf("RPM: %8.3f || Target: %d || motor_output: %d\n", current_rpm, target_speed, motor_output);
+        //I'm not sure which one of these I want to use...
+
+        //auto fixed_pid_out = PIDControllerF_tick(mpid_f, INT_TO_FIXED32(target_speed), FLOAT_TO_FIXED32(current_rpm), 200);
+
+        auto float_pid_out = motor_pid->tick(target_speed, current_rpm, 200);
+
+        motor_output = float_pid_out;
+        
+        //Serial.printf("RPM: %8.3f || Target: %d || FIXED: %5d\n", current_rpm, target_speed, fixed_pid_out);
 
     }
 
