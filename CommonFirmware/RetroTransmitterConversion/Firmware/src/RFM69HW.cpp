@@ -25,7 +25,7 @@ void RadioHandler::getCallback() {
 
 
         //note: this method causes HANGING!
-        instance->getCallbackThis();
+        //instance->getCallbackThis();
         
 
         if(custom_callback) {
@@ -38,14 +38,17 @@ void RadioHandler::getCallback() {
 void RadioHandler::getCallbackThis() {
     //process packet
 
-    //if(radio->receiveDone()) {
-    if(true) {
+    //Serial.printf("A");
+    if(radio->receiveDone()) {
+    //if(true) {
 
 
         last_RSSI = radio->RSSI;
 
         uint8_t data_length = radio->DATALEN;
         
+        Serial.printf("GET, %d\n", data_length);
+
         if(data_length > 0) {
 
             uint8_t * data_ptr = radio->DATA;
@@ -95,9 +98,9 @@ void RadioHandler::begin(
     if (encrypt_key)
         radio->encrypt(encrypt_key);
     
-    //runs when we get data
+    //runs when we get data (disabled for now)
     //attachInterrupt(rec_callback_pin, getCallback, HIGH);
-    radio->setIsrCallback(getCallback);
+    //radio->setIsrCallback(getCallback);
 
 }
 
@@ -123,12 +126,36 @@ bool RadioHandler::sendPacket(Packet* packet, ptype packet_type, uint16_t addres
     }
 
 bool RadioHandler::checkForPackets(Packet& packet_clone, ptype& packet_type) {
-    packet_clone = last_packet;
-    packet_type = last_packet_type;
 
-    bool is_new_data = unread_packet;
-    unread_packet = false;
-    return is_new_data;
+
+    //Serial.print("Check for packet");
+    if (radio->receiveDone()) {
+
+        Serial.print("Got Packet");
+
+
+        if (radio->ACKRequested())
+        {
+            radio->sendACK();
+            Serial.print(" ACK sent");
+        }
+        Serial.println("");
+    }
+    
+
+    return false;
+
+
+    // //Serial.print("N-A");
+    // getCallbackThis();
+    // //Serial.print("N-B");
+
+    // packet_clone = last_packet;
+    // packet_type = last_packet_type;
+
+    // bool is_new_data = unread_packet;
+    // unread_packet = false;
+    // return is_new_data;
 
 
 }

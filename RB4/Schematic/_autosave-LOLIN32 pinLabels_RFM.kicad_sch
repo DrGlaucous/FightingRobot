@@ -1,0 +1,1812 @@
+(kicad_sch
+	(version 20250114)
+	(generator "eeschema")
+	(generator_version "9.0")
+	(uuid "6c08986f-5555-4e85-822d-416be1696cb0")
+	(paper "A4")
+	(lib_symbols
+		(symbol "Espressif:ESP32-LOLIN32-Lite"
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -3.81 13.97 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "ESP32-LOLIN32-Lite"
+				(at 0 1.27 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "Espressif:ESP32-LOLIN32-Lite"
+				(at 2.54 2.54 90)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" ""
+				(at 2.54 7.62 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" ""
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "ESP32-LOLIN32-Lite_0_1"
+				(rectangle
+					(start -11.43 19.05)
+					(end 10.16 -16.51)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "ESP32-LOLIN32-Lite_1_1"
+				(pin bidirectional line
+					(at -16.51 16.51 0)
+					(length 5.08)
+					(name "VP"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 13.97 0)
+					(length 5.08)
+					(name "VN"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at -16.51 11.43 0)
+					(length 5.08)
+					(name "EN"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 8.89 0)
+					(length 5.08)
+					(name "D34"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "10"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 6.35 0)
+					(length 5.08)
+					(name "D35"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "11"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 3.81 0)
+					(length 5.08)
+					(name "D32"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "12"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 1.27 0)
+					(length 5.08)
+					(name "D33"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "13"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 -1.27 0)
+					(length 5.08)
+					(name "D25"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "14"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 -3.81 0)
+					(length 5.08)
+					(name "D26"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "15"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 -6.35 0)
+					(length 5.08)
+					(name "D27"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "16"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 -8.89 0)
+					(length 5.08)
+					(name "D14"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "17"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -16.51 -11.43 0)
+					(length 5.08)
+					(name "D12"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "18"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -16.51 -13.97 0)
+					(length 5.08)
+					(name "GND"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "19"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 15.24 16.51 180)
+					(length 5.08)
+					(name "3V3"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "40"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 13.97 180)
+					(length 5.08)
+					(name "D22"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "39"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 11.43 180)
+					(length 5.08)
+					(name "D19"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "38"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 8.89 180)
+					(length 5.08)
+					(name "D23"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "36"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 6.35 180)
+					(length 5.08)
+					(name "D18"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "35"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 3.81 180)
+					(length 5.08)
+					(name "D5"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "34"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 15.24 1.27 180)
+					(length 5.08)
+					(name "TX2/D17"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "27"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 15.24 -1.27 180)
+					(length 5.08)
+					(name "RX2/D16"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "25"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 -3.81 180)
+					(length 5.08)
+					(name "D4"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "24"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 -6.35 180)
+					(length 5.08)
+					(name "D0"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "23"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 -8.89 180)
+					(length 5.08)
+					(name "D2"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "22"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 -11.43 180)
+					(length 5.08)
+					(name "D15"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "21"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at 15.24 -13.97 180)
+					(length 5.08)
+					(name "D13"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+					(number "20"
+						(effects
+							(font
+								(size 1.016 1.016)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+		(symbol "My_Library:RFM69HW"
+			(pin_names
+				(offset 1.016)
+			)
+			(exclude_from_sim no)
+			(in_bom yes)
+			(on_board yes)
+			(property "Reference" "U"
+				(at -3.81 11.43 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Value" "RFM69HW"
+				(at -7.62 13.97 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+				)
+			)
+			(property "Footprint" "RF_Module:HOPERF_RFM69HW"
+				(at 24.638 13.97 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Datasheet" "https://www.hoperf.com/data/upload/portal/20181127/5bfcbb56f1fd7.pdf"
+				(at 46.99 17.018 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "Description" "ISM Radio Transceiver Module, SPI interface"
+				(at 31.75 19.558 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_keywords" "Radio ISM Transceiver Module AES"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(property "ki_fp_filters" "HOPERF*RFM69HW*"
+				(at 0 0 0)
+				(effects
+					(font
+						(size 1.27 1.27)
+					)
+					(hide yes)
+				)
+			)
+			(symbol "RFM69HW_0_1"
+				(rectangle
+					(start -10.16 10.16)
+					(end 10.16 -12.7)
+					(stroke
+						(width 0.254)
+						(type default)
+					)
+					(fill
+						(type background)
+					)
+				)
+			)
+			(symbol "RFM69HW_1_1"
+				(pin input line
+					(at -12.7 7.62 0)
+					(length 2.54)
+					(name "RESET"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -12.7 5.08 0)
+					(length 2.54)
+					(name "DIO0"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -12.7 2.54 0)
+					(length 2.54)
+					(name "DIO1"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -12.7 0 0)
+					(length 2.54)
+					(name "DIO2"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -12.7 -2.54 0)
+					(length 2.54)
+					(name "DIO3"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -12.7 -5.08 0)
+					(length 2.54)
+					(name "DIO4"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "6"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin bidirectional line
+					(at -12.7 -7.62 0)
+					(length 2.54)
+					(name "DIO5"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "7"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at -12.7 -10.16 0)
+					(length 2.54)
+					(name "3.3V"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "8"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin no_connect line
+					(at 12.7 7.62 180)
+					(length 2.54)
+					(name "NC"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "16"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 12.7 5.08 180)
+					(length 2.54)
+					(name "NSS"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "15"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 12.7 2.54 180)
+					(length 2.54)
+					(name "MOSI"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "14"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 12.7 0 180)
+					(length 2.54)
+					(name "MISO"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "13"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin input line
+					(at 12.7 -2.54 180)
+					(length 2.54)
+					(name "SCK"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "12"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 12.7 -5.08 180)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "11"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin output line
+					(at 12.7 -7.62 180)
+					(length 2.54)
+					(name "ANA"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "10"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+				(pin power_in line
+					(at 12.7 -10.16 180)
+					(length 2.54)
+					(name "GND"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+					(number "9"
+						(effects
+							(font
+								(size 1.27 1.27)
+							)
+						)
+					)
+				)
+			)
+			(embedded_fonts no)
+		)
+	)
+	(no_connect
+		(at 116.84 48.26)
+		(uuid "16b82482-72bc-4dc1-92ff-88c2f81e1d85")
+	)
+	(no_connect
+		(at 115.57 99.06)
+		(uuid "2bfc785a-1acf-447f-acc5-31d4739e0d3e")
+	)
+	(no_connect
+		(at 116.84 43.18)
+		(uuid "2ea1981c-f7af-45e7-8b49-07bb995e32bf")
+	)
+	(no_connect
+		(at 115.57 96.52)
+		(uuid "3bf335fd-02d9-46ec-9d9b-5e83e1093a73")
+	)
+	(no_connect
+		(at 115.57 101.6)
+		(uuid "b84378f4-17e3-4f82-b371-17295d372ead")
+	)
+	(no_connect
+		(at 116.84 45.72)
+		(uuid "d0ef8a72-c20f-4066-94e3-3b5b67349624")
+	)
+	(label "Out Good, (floating or LOW to flash)"
+		(at 148.59 68.58 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "03610aa6-bbbc-4bb2-a3b1-33e1a1b3b92d")
+	)
+	(label "GOOD"
+		(at 147.32 127 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "1a5ce26a-490c-4666-a208-0125a24353c9")
+	)
+	(label "D33"
+		(at 119.38 143.51 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "1bfae369-4442-41cb-8480-3445506ae8f9")
+	)
+	(label "GOOD"
+		(at 116.84 60.96 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "208a2f2a-55bc-4597-bbfe-b7d838f7fdfd")
+	)
+	(label "23"
+		(at 144.78 148.59 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "2c9ae679-0af8-4408-9e8d-a60c938f134b")
+	)
+	(label "Can't Pull HIGH at boot, out good"
+		(at 116.84 71.12 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "2ca0da15-122e-4c78-8a62-cc2f23be2651")
+	)
+	(label "GOOD"
+		(at 115.57 114.3 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "3004deb5-4f59-412e-adba-6e10662e95ed")
+	)
+	(label "RADIO INPUT"
+		(at 147.32 114.3 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "309abdd4-5fad-4fe3-993b-80c695dc1606")
+	)
+	(label "Input only, no internal pullups"
+		(at 115.57 104.14 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "3b58c614-071f-451e-91b1-e47ebc08fb3a")
+	)
+	(label "PWM at boot, pulled up input only (LOW to flash)"
+		(at 147.32 119.38 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "3cfc77c2-4832-4250-b694-15bff73d8670")
+	)
+	(label "GOOD"
+		(at 115.57 116.84 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "42632374-0079-4efb-98df-ecba7da64dd5")
+	)
+	(label "Can't Pull HIGH at boot, out good"
+		(at 115.57 124.46 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "4702641f-08ec-4c4c-a81b-61abff6e435d")
+	)
+	(label "GOOD"
+		(at 148.59 73.66 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4eb758ba-90a4-4283-b204-e8ae23059a0c")
+	)
+	(label "PWM at boot"
+		(at 148.59 71.12 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "51835509-67cb-4d74-a6be-2916fbbd18c4")
+	)
+	(label "GOOD"
+		(at 148.59 53.34 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "530a1ff1-072a-477e-9c64-31d1f76752a1")
+	)
+	(label "GOOD (Pin 17)"
+		(at 148.59 58.42 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "596ffe42-7886-4e03-9fca-1fb0daaf6ba7")
+	)
+	(label "GOOD"
+		(at 147.32 104.14 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "5a4a71b7-264c-4aab-9c13-caa1648f07c3")
+	)
+	(label "Input only, no internal pullups"
+		(at 115.57 106.68 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "654c6820-9eae-437a-b473-25f282e0d2e0")
+	)
+	(label "PWM at boot, pulled up input only (LOW to flash)"
+		(at 148.59 66.04 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6c81ec1c-ae94-4dcb-8d8f-6bf6ec027842")
+	)
+	(label "Input only, no internal pullups"
+		(at 116.84 50.8 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "6f6bfc54-e1d9-46aa-9e46-2dd301c5a3cf")
+	)
+	(label "GOOD (Pin 16)"
+		(at 148.59 60.96 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "711507c1-fb6e-4533-92b0-0df9968c2f8b")
+	)
+	(label "GOOD"
+		(at 116.84 58.42 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "75d64a22-46c2-4664-82cc-2a1a84d24301")
+	)
+	(label "PWM at boot"
+		(at 147.32 124.46 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "7f66c934-2f01-4dd9-8488-31a29fb31095")
+	)
+	(label "GOOD"
+		(at 115.57 109.22 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "85bcb65b-4f70-4340-a2e2-291292aee510")
+	)
+	(label "GOOD (Pin 17)"
+		(at 147.32 111.76 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "86b76dfb-1f3e-4671-9b3c-6546eccd8fc6")
+	)
+	(label "OK, PWM at boot"
+		(at 148.59 55.88 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8c45b06f-be33-4ef8-9113-012780bf4d2e")
+	)
+	(label "19"
+		(at 144.78 146.05 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "8d99523b-06c6-4c38-8ca3-493914050cb6")
+	)
+	(label "GOOD"
+		(at 115.57 119.38 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "982e0dd4-6f37-4dc0-9934-ef6b1f6cb195")
+	)
+	(label "GOOD"
+		(at 147.32 99.06 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a0039a68-f6b0-46e4-808a-6c24afd012de")
+	)
+	(label "GOOD"
+		(at 147.32 101.6 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "a8ed9cf1-4eb9-4bde-8513-efdf2e0dc54f")
+	)
+	(label "18"
+		(at 144.78 151.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ad6fc284-4074-47e7-95a8-7b9e905ee153")
+	)
+	(label "GOOD"
+		(at 148.59 63.5 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "ae76a729-1bf6-40a1-9a00-2f4fece28f7d")
+	)
+	(label "Input only, no internal pullups"
+		(at 116.84 53.34 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b4ff83b7-924e-4469-a5f0-f8ea154fd9e6")
+	)
+	(label "GOOD"
+		(at 116.84 63.5 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b71d9432-ce3b-4989-8f35-839e75488d73")
+	)
+	(label "GOOD"
+		(at 115.57 111.76 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "b9165b9d-1b2f-4bf5-a384-ec25315654aa")
+	)
+	(label "PWM at boot"
+		(at 116.84 68.58 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bac73079-442c-4175-aba0-2293922206d3")
+	)
+	(label "GOOD"
+		(at 116.84 55.88 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "bd4140c5-d45c-4f19-8d08-59182d657785")
+	)
+	(label "GOOD"
+		(at 148.59 50.8 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c5af6efb-e5ba-4550-a3ca-43ac1c742737")
+	)
+	(label "GOOD"
+		(at 148.59 45.72 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c7ff4d48-8dcc-48d5-bc33-a9679ce4d2cd")
+	)
+	(label "GOOD"
+		(at 147.32 106.68 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c97e4300-f29d-4526-a427-8837c6d089ac")
+	)
+	(label "GOOD"
+		(at 148.59 48.26 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d6913872-7524-4544-814f-3d47cb07f970")
+	)
+	(label "OK, PWM at boot"
+		(at 147.32 109.22 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d9e9d835-ac5a-4167-8f34-0c1a05a4d69e")
+	)
+	(label "GOOD"
+		(at 147.32 116.84 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "da235e8b-6eab-4255-962c-90f8e3f8844b")
+	)
+	(label "Out Good, (floating or LOW to flash)"
+		(at 147.32 121.92 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "e4b31778-0f40-421d-8eb3-60030dea0a85")
+	)
+	(label "D32"
+		(at 119.38 140.97 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "e8dc35e1-b58f-4d4a-a44b-fb4b0f032c7c")
+	)
+	(label "PWM at boot"
+		(at 115.57 121.92 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "f49685b8-5ca8-4006-bc30-50c57aef3644")
+	)
+	(label "22"
+		(at 144.78 143.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "f704b57d-1263-4a37-8507-b8b3114b9100")
+	)
+	(label "GOOD"
+		(at 116.84 66.04 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "fda6abb5-bb19-4759-bf46-f5e24049ecd8")
+	)
+	(symbol
+		(lib_id "My_Library:RFM69HW")
+		(at 132.08 148.59 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "99f5fa5b-99d9-4ab9-bbef-f8953e1d99ed")
+		(property "Reference" "U2"
+			(at 132.08 133.35 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "RFM69HW"
+			(at 132.08 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "RF_Module:HOPERF_RFM69HW"
+			(at 156.718 134.62 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" "https://www.hoperf.com/data/upload/portal/20181127/5bfcbb56f1fd7.pdf"
+			(at 179.07 131.572 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" "ISM Radio Transceiver Module, SPI interface"
+			(at 163.83 129.032 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(pin "3"
+			(uuid "1ce9de4e-5506-4faa-87b6-fb16bf5978eb")
+		)
+		(pin "6"
+			(uuid "d74e4c68-dbc0-400a-9838-2171429793a3")
+		)
+		(pin "7"
+			(uuid "e405de04-dfe4-4c35-a863-357ae80a1a3e")
+		)
+		(pin "11"
+			(uuid "7383de4e-6493-45d5-b221-b98d2ba33a41")
+		)
+		(pin "1"
+			(uuid "fee79dc4-b09b-40eb-8758-62f4ee7d501e")
+		)
+		(pin "9"
+			(uuid "c4d191fa-0ef0-4a44-8136-971d2319f093")
+		)
+		(pin "5"
+			(uuid "fbcdc091-c1be-4945-a960-f05aeeab130c")
+		)
+		(pin "13"
+			(uuid "33bc8eb7-6391-4f94-91ec-f18cbf5f555f")
+		)
+		(pin "10"
+			(uuid "71d3b5fc-1ec1-47d7-805c-94de78dd6b82")
+		)
+		(pin "16"
+			(uuid "acd4f3b8-78c9-4431-8121-c6e1bc587444")
+		)
+		(pin "2"
+			(uuid "b8961b9f-e03f-4738-be8f-0529d436f08e")
+		)
+		(pin "4"
+			(uuid "fa8f2fc5-61e0-456d-955f-488fc5add046")
+		)
+		(pin "8"
+			(uuid "27e20304-3d28-4871-8c4b-dc44512b2612")
+		)
+		(pin "15"
+			(uuid "5a2f7cc3-72dd-4e59-b682-caede467ca00")
+		)
+		(pin "14"
+			(uuid "14f04779-4c3c-457d-85eb-90cd3adcc225")
+		)
+		(pin "12"
+			(uuid "ec31727c-2173-4b12-9327-12d1d115dd03")
+		)
+		(instances
+			(project ""
+				(path "/6c08986f-5555-4e85-822d-416be1696cb0"
+					(reference "U2")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Espressif:ESP32-LOLIN32-Lite")
+		(at 132.08 113.03 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "aa28752d-6981-471a-a5a3-66103cd7a42c")
+		(property "Reference" "U1"
+			(at 131.445 88.9 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ESP32-LOLIN32-Lite"
+			(at 131.445 91.44 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Espressif:ESP32-LOLIN32-Lite"
+			(at 134.62 110.49 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 134.62 105.41 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 132.08 113.03 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "10"
+			(uuid "9cd9c1d8-7fb3-478d-9295-15d3097af981")
+		)
+		(pin "11"
+			(uuid "2c528098-3dad-448f-8e68-18eb67d36b67")
+		)
+		(pin "12"
+			(uuid "3bc2e904-eacf-4e77-8704-5b03d1eb7e2c")
+		)
+		(pin "13"
+			(uuid "a82c175a-cafe-4405-9e17-b2adf4ebe02a")
+		)
+		(pin "14"
+			(uuid "4fbe4f6a-30e3-4bb5-b4d0-aa6426c13ef5")
+		)
+		(pin "15"
+			(uuid "3a996d75-d343-4bd5-ae37-ba18cb5f72d5")
+		)
+		(pin "16"
+			(uuid "1b39f670-d0bb-4969-8436-36c88dbf0e33")
+		)
+		(pin "17"
+			(uuid "4aa1a9cb-1a82-4cb3-8534-71aafda4f787")
+		)
+		(pin "18"
+			(uuid "0901df05-c87c-4771-b6c2-cb788cc5897f")
+		)
+		(pin "19"
+			(uuid "2167a498-29c2-4aea-9391-65e8d895fd7f")
+		)
+		(pin "20"
+			(uuid "3b685a0a-f7ad-4c62-83f8-37a343a6acf0")
+		)
+		(pin "21"
+			(uuid "b9b6abec-28fa-488a-969d-c5c945acd4ca")
+		)
+		(pin "22"
+			(uuid "d14809fd-aa08-4468-90e9-8bff4e3753b4")
+		)
+		(pin "23"
+			(uuid "c195d140-13fa-45dd-84a1-8ec16081aed6")
+		)
+		(pin "24"
+			(uuid "9bb1c873-d9b7-4e59-be6f-16e05b2af7c6")
+		)
+		(pin "25"
+			(uuid "d80887a7-88d7-4aba-87e8-ab99fa0f0821")
+		)
+		(pin "27"
+			(uuid "6bfbc739-e25b-4ccd-8723-5273d380e20e")
+		)
+		(pin "34"
+			(uuid "db6c83a2-02ec-4291-9bfe-689ece325303")
+		)
+		(pin "35"
+			(uuid "60895383-c0e2-43c2-87cc-f52e65d4ca4f")
+		)
+		(pin "36"
+			(uuid "863431c1-4a13-4331-a251-3c4aa5309eff")
+		)
+		(pin "38"
+			(uuid "d7459de7-2cde-4d60-b547-a70f41e95c7d")
+		)
+		(pin "39"
+			(uuid "53bd16d3-990c-4dea-83a6-b531319eed96")
+		)
+		(pin "40"
+			(uuid "211eec20-80d0-44dc-b950-091cd70698c3")
+		)
+		(pin "5"
+			(uuid "6b6b67ee-4907-4374-984c-b020caa1027f")
+		)
+		(pin "8"
+			(uuid "b8c54a7c-429a-4359-bf4d-d97d55e2d2a6")
+		)
+		(pin "9"
+			(uuid "bf90cb12-91b0-4ab4-a98b-9107b20b889e")
+		)
+		(instances
+			(project "LOLIN32 pinLabels_RFM"
+				(path "/6c08986f-5555-4e85-822d-416be1696cb0"
+					(reference "U1")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "Espressif:ESP32-LOLIN32-Lite")
+		(at 133.35 59.69 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "e33f6132-30c7-4a64-b89a-cd7da461c8a7")
+		(property "Reference" "U?"
+			(at 132.715 35.56 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "ESP32-LOLIN32-Lite"
+			(at 132.715 38.1 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Espressif:ESP32-LOLIN32-Lite"
+			(at 135.89 57.15 90)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 135.89 52.07 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 133.35 59.69 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "10"
+			(uuid "52cc328b-25d0-4cec-8c1d-ca9c671bca83")
+		)
+		(pin "11"
+			(uuid "f272da17-dc6b-465a-8c7c-f45eec557a95")
+		)
+		(pin "12"
+			(uuid "4b60308c-f828-4beb-831b-dbd1310c9334")
+		)
+		(pin "13"
+			(uuid "795b3e3e-f18d-425e-9d44-ef346a6dde8d")
+		)
+		(pin "14"
+			(uuid "f8d46035-0040-45e8-8089-08f9dff86b21")
+		)
+		(pin "15"
+			(uuid "a25890b6-1bb0-49b6-a0ed-283977959d81")
+		)
+		(pin "16"
+			(uuid "0644bedc-941b-4770-91db-946a74a012d1")
+		)
+		(pin "17"
+			(uuid "466a59b7-2905-4ade-aafc-7ca4462416dc")
+		)
+		(pin "18"
+			(uuid "78396c00-403c-4792-af76-03884ae62d10")
+		)
+		(pin "19"
+			(uuid "77a48641-b241-4139-b87f-8f26aee367cc")
+		)
+		(pin "20"
+			(uuid "db84fc72-8b1e-4a2c-b207-75a052a727e6")
+		)
+		(pin "21"
+			(uuid "b08997c1-8f4b-4b12-87e5-e2c13850ef4b")
+		)
+		(pin "22"
+			(uuid "b776dbcd-1043-43fa-9114-49251c69c529")
+		)
+		(pin "23"
+			(uuid "9ab2c5d0-3009-47d9-b129-ee0312c359d1")
+		)
+		(pin "24"
+			(uuid "0b12fcce-75a4-4e59-a2e9-71ff1fc778fe")
+		)
+		(pin "25"
+			(uuid "3a931320-f4f9-4327-957d-c4b0ff71f935")
+		)
+		(pin "27"
+			(uuid "ef5053ef-24ae-4800-a681-a3a039d2d0c5")
+		)
+		(pin "34"
+			(uuid "a0b96435-c8ef-4bb7-94ad-97e81e05cb67")
+		)
+		(pin "35"
+			(uuid "8ff7aead-819c-4b7d-8bef-8eb9ce661c29")
+		)
+		(pin "36"
+			(uuid "83ba1b15-187e-4734-8280-6ae8524571af")
+		)
+		(pin "38"
+			(uuid "51066b44-68f7-491b-913a-d717041fec61")
+		)
+		(pin "39"
+			(uuid "ebc1d2ad-1111-485c-a52a-28242f18d32f")
+		)
+		(pin "40"
+			(uuid "2faa7c0d-fab6-4084-8938-12caa6e4d330")
+		)
+		(pin "5"
+			(uuid "37370889-26bb-4fc2-b1b9-fd18a72fdd94")
+		)
+		(pin "8"
+			(uuid "0c8a2942-66f6-45c1-8c3d-c356217897dd")
+		)
+		(pin "9"
+			(uuid "28f944a3-e4c7-4018-8e3e-62d9d1d3dc26")
+		)
+		(instances
+			(project "LOLIN32 pinLabels"
+				(path "/6c08986f-5555-4e85-822d-416be1696cb0"
+					(reference "U?")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(sheet_instances
+		(path "/"
+			(page "1")
+		)
+	)
+	(embedded_fonts no)
+)

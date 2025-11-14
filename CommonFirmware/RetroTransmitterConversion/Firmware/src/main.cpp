@@ -3,33 +3,26 @@
 
 
 #include "configuration.h"
-#include "RFM69HW.h"
+//#include "RFM69HW.h"
 
 
-RadioHandler radio;
+//RadioHandler radio;
 
-void onPacketGet() {
 
-    Packet got_packet = {};
-    ptype type = {};
-    if(radio.checkForPackets(got_packet, type)) {
-        Serial.printf("Got packet of type: %d\n", type);
+RFM69* radio = nullptr; //new RFM69((uint8_t)PIN_NSS, (uint8_t)PIN_ISR, true, &SPI);
 
-        if(type == CONTROL_TYPE) {            
-            Serial.printf("Analog Channel 0: %d\n", got_packet.control.analog_channels[0]);
-        } else {
-            Serial.printf("Response voltage: %f\n", got_packet.response.battery_voltage);
-        }
-    }
 
+int incr = 0;
+void onGet() {
+    incr += 1;
 }
-
 
 void setup() {
 
-    //open serial for debugging
     Serial.begin(115200);
 
+
+    Serial.printf("Program start\n");
 
 #ifdef USING_ESP32
     SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI);
@@ -37,15 +30,21 @@ void setup() {
     SPI.begin();
 #endif
 
-    radio.begin(&SPI, PIN_NSS, PIN_RESET, PIN_ISR, MYNODEID, TONODEID, ENCRYPTKEY);
-
-    //runs when we get a packet
-    radio.setCustomRecCallback(onPacketGet);
+    Serial.printf("SPI started\n");
 
 
-    //stm32 tests:
-    pinMode(PC13, OUTPUT);
-    digitalWrite(PC13, LOW);
+    ////////////////////////////
+
+    radio = new RFM69((uint8_t)PIN_NSS, (uint8_t)PIN_ISR, true, &SPI);
+    radio->initialize(FREQUENCY, MYNODEID, NETWORKID);
+    radio->setHighPower();
+
+#ifdef ENCRYPTKEY
+    radio->encrypt(ENCRYPTKEY);
+#endif
+
+
+  Serial.print("Radio initialized");
 
 }
 
@@ -54,35 +53,36 @@ bool flip = false;
 int last_ms = 0;
 void loop() {
 
-    // while(1) {
-    //     digitalWrite(PC13, LOW);
-    //     delay(1000);
-    //     digitalWrite(PC13, HIGH);
-    //     delay(1000);
-    // }
+
 
 
     if(millis() - last_ms >= 1000) {
         flip = !flip;
         last_ms = millis();
-        Serial.printf("Hello, there.\n");
+        Serial.printf("Sending..\n");
 
-        Packet packet = {};
-        if(flip) {
-            packet.control.analog_channels[0] = -336;
-            packet.control.digital_switches[0] = 1;
-            radio.sendPacket(&packet, CONTROL_TYPE, TONODEID, USEACK);
+        char sendBuffer2[] = {"Hello, there"};
+        radio->send(TONODEID, sendBuffer2, sizeof(sendBuffer2));
+    }
 
-            digitalWrite(PC13, LOW);
+    //always be checking for packets
+    if (radio->receiveDone())
+    {
+        Serial.print("received from node ");
+        Serial.print(radio->SENDERID, DEC);
+        Serial.print(", message [");
 
+        for (byte i = 0; i < radio->DATALEN; i++)
+              Serial.print((char)radio->DATA[i]);
 
-        } else {
-            packet.response.battery_voltage = 44.312;
-            radio.sendPacket(&packet, RESPONSE_TYPE, TONODEID, USEACK);
+        Serial.print("], RSSI ");
+        Serial.println(radio->RSSI);
 
-            digitalWrite(PC13, HIGH);
-        }     
-
+        if (radio->ACKRequested())
+        {
+            radio->sendACK();
+            Serial.println("ACK sent");
+        }
     }
 
     delay(1);
