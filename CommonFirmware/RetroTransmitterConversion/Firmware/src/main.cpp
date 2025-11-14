@@ -3,26 +3,15 @@
 
 
 #include "configuration.h"
-//#include "RFM69HW.h"
+#include "RFM69HW.h"
 
 
-//RadioHandler radio;
+RadioHandler* rh = nullptr;
 
-
-RFM69* radio = nullptr; //new RFM69((uint8_t)PIN_NSS, (uint8_t)PIN_ISR, true, &SPI);
-
-
-int incr = 0;
-void onGet() {
-    incr += 1;
-}
 
 void setup() {
 
     Serial.begin(115200);
-
-
-    Serial.printf("Program start\n");
 
 #ifdef USING_ESP32
     SPI.begin(PIN_SCK, PIN_MISO, PIN_MOSI);
@@ -30,62 +19,45 @@ void setup() {
     SPI.begin();
 #endif
 
-    Serial.printf("SPI started\n");
 
 
-    ////////////////////////////
+    rh = new RadioHandler();
 
-    radio = new RFM69((uint8_t)PIN_NSS, (uint8_t)PIN_ISR, true, &SPI);
-    radio->initialize(FREQUENCY, MYNODEID, NETWORKID);
-    radio->setHighPower();
-
-#ifdef ENCRYPTKEY
-    radio->encrypt(ENCRYPTKEY);
-#endif
+    rh->begin(&SPI, PIN_NSS, PIN_RESET, PIN_ISR, MYNODEID, NETWORKID, ENCRYPTKEY);
 
 
-  Serial.print("Radio initialized");
+
 
 }
 
 
-bool flip = false;
 int last_ms = 0;
 void loop() {
 
 
-
-
     if(millis() - last_ms >= 1000) {
-        flip = !flip;
+
+        Serial.printf("Send\n");
+
         last_ms = millis();
-        Serial.printf("Sending..\n");
 
-        char sendBuffer2[] = {"Hello, there"};
-        radio->send(TONODEID, sendBuffer2, sizeof(sendBuffer2));
+        Packet pt = {};
+        pt.control.analog_channels[0] = 67;
+        ptype ptt = CONTROL_TYPE;
+        rh->sendPacket(&pt, ptt, TONODEID, false);
     }
 
-    //always be checking for packets
-    if (radio->receiveDone())
-    {
-        Serial.print("received from node ");
-        Serial.print(radio->SENDERID, DEC);
-        Serial.print(", message [");
 
-        for (byte i = 0; i < radio->DATALEN; i++)
-              Serial.print((char)radio->DATA[i]);
-
-        Serial.print("], RSSI ");
-        Serial.println(radio->RSSI);
-
-        if (radio->ACKRequested())
-        {
-            radio->sendACK();
-            Serial.println("ACK sent");
-        }
+    Packet pt = {};
+    ptype ptt = {};
+    if(rh->checkForPackets(pt, ptt)) {
+        //nothing for now.
+        Serial.printf("Analog channel 0: %d\n", pt.control.analog_channels[0]);
+        
     }
 
-    delay(1);
+
+
 
 }
 

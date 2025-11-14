@@ -56,9 +56,9 @@ private:
     static void (*custom_callback)();
 
     //last rx data, there is no caching system.
-    Packet last_packet = {};
-    ptype last_packet_type = RESPONSE_TYPE;
-    bool unread_packet = false;
+    //Packet last_packet = {};
+    //ptype last_packet_type = RESPONSE_TYPE;
+    //bool unread_packet = false;
     int16_t last_RSSI = 0;
 
 
@@ -97,6 +97,9 @@ public:
 
     //returns true if the packet is new and false if this method was called multiple times before the next rx
     bool checkForPackets(Packet& packet_clone, ptype& packet_type);
+
+
+
 
 };
 
