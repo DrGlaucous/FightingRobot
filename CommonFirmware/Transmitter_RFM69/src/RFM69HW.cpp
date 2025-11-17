@@ -1,0 +1,182 @@
+#include "RFM69HW.h"
+
+
+//these dang things keep this from being header-only.
+RFM_RadioHandler* RFM_RadioHandler::instance = NULL;
+void (*RFM_RadioHandler::custom_callback)() = NULL;
+
+RFM_RadioHandler::RFM_RadioHandler() {
+    instance = this;
+    custom_callback = NULL;
+}
+
+RFM_RadioHandler::~RFM_RadioHandler() {
+    if(radio != NULL) {
+        delete radio;
+        radio = NULL;
+    }
+    instance = NULL;
+    custom_callback = NULL;
+}
+
+void RFM_RadioHandler::getCallback() {
+
+    if(instance != NULL) {
+        instance->getCallbackThis();
+    }
+
+    if(custom_callback) {
+        custom_callback();
+    }
+
+
+}
+
+void RFM_RadioHandler::getCallbackThis() {
+
+    //do nothing for now
+
+
+
+    //////////////////////////////////////////////
+
+
+
+    // //Serial.printf("A");
+    // if(radio->receiveDone()) {
+    // //if(true) {
+
+
+    //     last_RSSI = radio->RSSI;
+
+    //     uint8_t data_length = radio->DATALEN;
+        
+    //     Serial.printf("GET, %d\n", data_length);
+
+    //     if(data_length > 0) {
+
+    //         uint8_t * data_ptr = radio->DATA;
+    //         last_packet_type = (ptype)(*data_ptr);
+
+    //         //move read cursor forward
+    //         data_ptr += sizeof(ptype);
+
+    //         //copy packet values into storage
+    //         memcpy(&last_packet, data_ptr, sizeof(Packet));
+
+    //         //flag as fresh
+    //         unread_packet = true;
+    //     }
+    //     if(radio->ACKRequested()) {
+    //         radio->sendACK();
+    //     }
+
+    // }
+
+
+}
+
+void RFM_RadioHandler::begin(
+    SPIClass* spi,
+    uint8_t slave_select_pin,
+    uint8_t reset_pin,
+    uint8_t rec_callback_pin,
+    uint8_t my_id,
+    uint8_t network_id,
+    const char* encrypt_key
+) {
+    
+    //ensure the module is reset before starting
+    pinMode(reset_pin, OUTPUT);
+    digitalWrite(reset_pin, 1);
+    delay(1);
+    digitalWrite(reset_pin, 0);
+    delay(5);
+
+
+    //SPI.begin(SCK, MISO, MOSI, NSS);
+    radio = new RFM69(slave_select_pin, rec_callback_pin, true, spi);
+    
+    radio->initialize(RF69_915MHZ, my_id, network_id);
+    radio->setHighPower();
+
+    //runs when we get data
+    //attachInterrupt(rec_callback_pin, getCallback, HIGH); //don't use this; use setIsrCallback instead
+    radio->setIsrCallback(getCallback);
+
+    //turn on encryption if desired:
+    if (encrypt_key)
+        radio->encrypt(encrypt_key);
+    
+
+}
+
+void RFM_RadioHandler::setCustomRecCallback(void (*callback)()) {
+    custom_callback = callback;
+}
+
+bool RFM_RadioHandler::sendPacket(RFM_Packet* packet, ptype packet_type, uint16_t address, bool use_ack) {
+
+    char send_buffer[sizeof(RFM_Packet) + sizeof(ptype)] = {};
+    char* sb_cursor = send_buffer;
+
+    *sb_cursor = packet_type;
+    sb_cursor += sizeof(ptype);
+    memcpy(sb_cursor, packet, sizeof(RFM_Packet));
+
+    if(use_ack) {
+        return radio->sendWithRetry(address, send_buffer, sizeof(send_buffer));
+    } else {
+        radio->send(address, send_buffer, sizeof(send_buffer));
+        return true; //assume transmission was a success
+    }
+}
+
+bool RFM_RadioHandler::checkForPackets(RFM_Packet& packet_clone, ptype& packet_type) {
+
+
+    //Serial.print("Check for packet");
+    if (radio->receiveDone()) {
+
+
+        last_RSSI = radio->RSSI;
+
+        uint8_t data_length = radio->DATALEN;
+
+        if(data_length > 0) {
+
+            uint8_t * data_ptr = radio->DATA;
+            packet_type = (ptype)(*data_ptr);
+
+            //move read cursor forward
+            data_ptr += sizeof(ptype);
+
+            //copy packet values into storage
+            memcpy(&packet_clone, data_ptr, sizeof(RFM_Packet));
+
+            //flag as fresh
+            //unread_packet = true;
+        }
+        if(radio->ACKRequested()) {
+            radio->sendACK();
+        }
+
+
+        // Serial.print("Got Packet: ");
+        // for (byte i = 0; i < radio->DATALEN; i++)
+        //       Serial.printf("%x ", radio->DATA[i]);
+        
+        // if (radio->ACKRequested())
+        // {
+        //     radio->sendACK();
+        //     Serial.print(" ACK sent");
+        // }
+        // Serial.println("");
+
+        return true;
+    }
+    
+    return false;
+
+}
+

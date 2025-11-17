@@ -2764,6 +2764,10 @@
 		(uuid "6b18d6a6-fa3f-495b-8ebb-fe8953db79c9")
 	)
 	(no_connect
+		(at 73.66 146.05)
+		(uuid "7ca9f70f-4505-491a-b999-6f432a956cca")
+	)
+	(no_connect
 		(at 242.57 39.37)
 		(uuid "8608d502-a7b7-44ec-94ec-a6e7981b9959")
 	)
@@ -2796,6 +2800,16 @@
 			(type default)
 		)
 		(uuid "0386b1ef-eea9-4158-b6ba-7eb632dfe0b0")
+	)
+	(wire
+		(pts
+			(xy 93.98 146.05) (xy 118.11 146.05)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "118aa722-1132-4e70-a82f-8ef4337bd613")
 	)
 	(wire
 		(pts
@@ -2999,6 +3013,16 @@
 	)
 	(wire
 		(pts
+			(xy 93.98 135.89) (xy 118.11 135.89)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "870929cb-7222-442b-ae5e-ef3c4d1ebed1")
+	)
+	(wire
+		(pts
 			(xy 181.61 64.77) (xy 182.88 64.77)
 		)
 		(stroke
@@ -3056,6 +3080,26 @@
 			(type default)
 		)
 		(uuid "a75cc36b-03e1-4afa-a661-14c32b456088")
+	)
+	(wire
+		(pts
+			(xy 93.98 133.35) (xy 118.11 133.35)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "aaacbfd9-8278-4814-9218-687e94c1207d")
+	)
+	(wire
+		(pts
+			(xy 93.98 143.51) (xy 118.11 143.51)
+		)
+		(stroke
+			(width 0)
+			(type default)
+		)
+		(uuid "b5d56084-9c4c-4244-9ba1-b18b2525d478")
 	)
 	(wire
 		(pts
@@ -3148,7 +3192,7 @@
 		(uuid "fb36cde6-e75b-46a6-ada9-d4b9fe5e941e")
 	)
 	(label "GOOD"
-		(at 344.17 39.37 0)
+		(at 265.43 104.14 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3188,7 +3232,7 @@
 		(uuid "1ba3ca8b-ee78-4cf6-bcb9-a339dcc34b19")
 	)
 	(label "GOOD"
-		(at 313.69 31.75 180)
+		(at 234.95 96.52 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3196,6 +3240,16 @@
 			(justify right bottom)
 		)
 		(uuid "1c40bb52-f1de-4aaa-a7d0-a2b791dc069d")
+	)
+	(label "USED FOR PRINT"
+		(at 118.11 148.59 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "1efe147e-86f0-423e-9b8b-7eecbcb407c5")
 	)
 	(label "M1 Control B"
 		(at 119.38 45.72 0)
@@ -3277,6 +3331,16 @@
 		)
 		(uuid "3e42acfd-5d4a-4150-9a2d-cc4dde5e4317")
 	)
+	(label "HIGH IN ON START, OUT GOOD"
+		(at 148.59 146.05 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "4604ffd2-0507-4920-a862-90d86170f914")
+	)
 	(label "NSS"
 		(at 88.9 38.1 180)
 		(effects
@@ -3298,7 +3362,7 @@
 		(uuid "475b1152-208b-4ee2-8923-59e96732a7a9")
 	)
 	(label "GOOD"
-		(at 344.17 44.45 0)
+		(at 265.43 109.22 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3348,7 +3412,7 @@
 		(uuid "611d3857-29ee-4758-ba3e-39b127a2a8b3")
 	)
 	(label "BOOT, OUT GOOD"
-		(at 313.69 39.37 180)
+		(at 234.95 104.14 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3367,8 +3431,8 @@
 		)
 		(uuid "63b6ec08-16c0-4091-af9b-9f737620f18a")
 	)
-	(label "HIGH IN ON START, OUT GOOD"
-		(at 313.69 36.83 180)
+	(label "HIGH IN ON START, OUT GOOD, LED"
+		(at 234.95 101.6 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3386,6 +3450,16 @@
 			(justify left bottom)
 		)
 		(uuid "67aab9a4-ce2f-4abf-bf1f-540a76b11227")
+	)
+	(label "GOOD"
+		(at 148.59 151.13 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "6c8b30fc-67c7-49fc-a303-8a6f7f769a22")
 	)
 	(label "SCK"
 		(at 271.78 68.58 0)
@@ -3448,7 +3522,7 @@
 		(uuid "876fb546-ca44-485b-8b39-1512210ffaab")
 	)
 	(label "USED FOR PRINT"
-		(at 313.69 44.45 180)
+		(at 234.95 109.22 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3468,7 +3542,7 @@
 		(uuid "88598eca-1ff6-4021-b319-1698903a02fc")
 	)
 	(label "GOOD"
-		(at 313.69 29.21 180)
+		(at 234.95 93.98 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3478,7 +3552,7 @@
 		(uuid "88fdee2b-bacb-48b6-9007-a0d7461a9e02")
 	)
 	(label "GOOD"
-		(at 313.69 41.91 180)
+		(at 234.95 106.68 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3518,7 +3592,7 @@
 		(uuid "92bc594c-b1eb-4cdd-acac-f5681bd42722")
 	)
 	(label "USED FOR PRINT"
-		(at 313.69 46.99 180)
+		(at 234.95 111.76 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3538,7 +3612,7 @@
 		(uuid "9d4e2276-3206-4a4c-b791-1a04004b5d9b")
 	)
 	(label "GOOD"
-		(at 344.17 46.99 0)
+		(at 265.43 111.76 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3598,7 +3672,7 @@
 		(uuid "b2f3723e-9e26-4739-b222-cab54546c7fa")
 	)
 	(label "GOOD"
-		(at 344.17 36.83 0)
+		(at 265.43 101.6 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3617,6 +3691,26 @@
 		)
 		(uuid "b6d5ec4b-0027-4955-b4a8-083908dfec31")
 	)
+	(label "GOOD"
+		(at 148.59 143.51 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "c115a1ab-e16c-4ae7-90be-3a95a6d1250c")
+	)
+	(label "USED FOR PRINT"
+		(at 118.11 151.13 180)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify right bottom)
+		)
+		(uuid "c1c249d8-9bc2-4130-ad85-37e183d825fa")
+	)
 	(label "MOSI"
 		(at 88.9 35.56 180)
 		(effects
@@ -3628,7 +3722,7 @@
 		(uuid "c25fe245-08a2-41f9-a181-dbe77560fe52")
 	)
 	(label "GOOD"
-		(at 313.69 34.29 180)
+		(at 234.95 99.06 180)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3656,6 +3750,16 @@
 			(justify right bottom)
 		)
 		(uuid "cf1b18a1-e19f-441d-bd2e-8ce15b10a7d4")
+	)
+	(label "GOOD"
+		(at 148.59 148.59 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "d304bf5b-eaea-4165-8b6f-c9f417fcb552")
 	)
 	(label "M1 Control A"
 		(at 242.57 34.29 180)
@@ -3718,7 +3822,7 @@
 		(uuid "f7b2b9f6-ea0b-4284-9131-c50cfebe2fde")
 	)
 	(label "HIGH IN ON START, OUT GOOD"
-		(at 344.17 41.91 0)
+		(at 265.43 106.68 0)
 		(effects
 			(font
 				(size 1.27 1.27)
@@ -3726,6 +3830,16 @@
 			(justify left bottom)
 		)
 		(uuid "f90428bf-7bd6-4f5f-8ed4-a770c441bc20")
+	)
+	(label "GOOD"
+		(at 148.59 140.97 0)
+		(effects
+			(font
+				(size 1.27 1.27)
+			)
+			(justify left bottom)
+		)
+		(uuid "fbadf4ca-f089-4edc-b809-250e131bf2ba")
 	)
 	(symbol
 		(lib_id "power:GND")
@@ -4109,6 +4223,212 @@
 		)
 	)
 	(symbol
+		(lib_id "Espressif:ESP32-C3-SuperMini_PLUS")
+		(at 133.35 142.24 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "309ec476-04c7-4196-a695-8a4aaa542435")
+		(property "Reference" "U9"
+			(at 133.35 128.27 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "~"
+			(at 133.35 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "Espressif:ESP32-C3-SuperMini_PLUS"
+			(at 133.35 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 133.35 124.46 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 133.35 142.24 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "aec27574-604b-45aa-9e75-752ae1b2215f")
+		)
+		(pin "10"
+			(uuid "2dc7c892-4d55-4603-8f89-4085e7c067a3")
+		)
+		(pin "11"
+			(uuid "3383c941-0e45-4dcb-8b50-94e005da2cb7")
+		)
+		(pin "12"
+			(uuid "43da85fe-04fc-4a1a-8ff3-6f3bd0f91b61")
+		)
+		(pin "13"
+			(uuid "b0c7e6ef-49ec-40f5-8b40-c73007c38830")
+		)
+		(pin "14"
+			(uuid "8f3dbac0-57b9-475f-9114-aabf23760dd5")
+		)
+		(pin "15"
+			(uuid "dc235eea-b7b5-40b1-9a06-b0a5abcc4034")
+		)
+		(pin "16"
+			(uuid "eba60752-8f31-4d4c-b858-4c1d98687be7")
+		)
+		(pin "2"
+			(uuid "e0efdc88-cfd3-405d-841f-3f1d9c4a27ae")
+		)
+		(pin "3"
+			(uuid "9a055f18-642d-44a9-9ab5-629889073a60")
+		)
+		(pin "4"
+			(uuid "66a300ff-1957-4fed-80fa-b7048b190494")
+		)
+		(pin "5"
+			(uuid "86fba5b4-6d61-4d91-8b63-739189d7aca9")
+		)
+		(pin "6"
+			(uuid "cfc2e3db-0c23-46f1-a372-ce738aa99aa7")
+		)
+		(pin "7"
+			(uuid "877a5336-dac4-4ed0-b497-b6211f740be6")
+		)
+		(pin "8"
+			(uuid "a2cc55e7-af6d-4851-a1c5-36e2b5464aea")
+		)
+		(pin "9"
+			(uuid "686ba527-82ab-4783-9bc8-11723df29e06")
+		)
+		(instances
+			(project "Schematic"
+				(path "/f593349a-896f-49a8-9ff9-ef5311981ebc"
+					(reference "U9")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
+		(lib_id "My_Library:HW-627")
+		(at 83.82 139.7 0)
+		(unit 1)
+		(exclude_from_sim no)
+		(in_bom yes)
+		(on_board yes)
+		(dnp no)
+		(fields_autoplaced yes)
+		(uuid "316a2c8a-25fd-40d5-a79c-0851b615fd10")
+		(property "Reference" "U8"
+			(at 83.82 125.73 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Value" "~"
+			(at 86.36 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(property "Footprint" "My_Library:HW-627"
+			(at 83.82 127 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Datasheet" ""
+			(at 86.36 135.89 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+				(hide yes)
+			)
+		)
+		(property "Description" ""
+			(at 83.82 139.7 0)
+			(effects
+				(font
+					(size 1.27 1.27)
+				)
+			)
+		)
+		(pin "1"
+			(uuid "1bc92004-ede3-41c7-965a-cc222ac8e50d")
+		)
+		(pin "10"
+			(uuid "e3b9bad0-b0d3-43cf-8e86-52eddb51480d")
+		)
+		(pin "11"
+			(uuid "750005af-f465-4ea3-ae80-40e2caa7ee44")
+		)
+		(pin "12"
+			(uuid "77444a97-3eac-48ce-a87e-84ed2d16479b")
+		)
+		(pin "2"
+			(uuid "8931ee97-e50f-41ae-a7d5-959fe6505d04")
+		)
+		(pin "3"
+			(uuid "16ba10b8-c977-4923-a32d-5ee4c38eb1bd")
+		)
+		(pin "4"
+			(uuid "e15d29f3-e086-41c4-bba3-7daab574703d")
+		)
+		(pin "5"
+			(uuid "2f1b0a1e-d701-4c3f-b3ad-5a6eb6f41a0c")
+		)
+		(pin "6"
+			(uuid "f6a5e9d2-744c-4912-be0a-4868b29bb386")
+		)
+		(pin "7"
+			(uuid "175bd752-bcaa-4293-9501-9dbddb68ddbe")
+		)
+		(pin "8"
+			(uuid "1a4a46a2-1be8-4f3a-8e0d-61e5753776a3")
+		)
+		(pin "9"
+			(uuid "62789f3d-9ed0-4805-88bd-c87907a19adc")
+		)
+		(instances
+			(project "Schematic"
+				(path "/f593349a-896f-49a8-9ff9-ef5311981ebc"
+					(reference "U8")
+					(unit 1)
+				)
+			)
+		)
+	)
+	(symbol
 		(lib_id "power:+3.3V")
 		(at 212.09 64.77 270)
 		(unit 1)
@@ -4243,7 +4563,7 @@
 	)
 	(symbol
 		(lib_id "Espressif:ESP32-C3-SuperMini_PLUS")
-		(at 328.93 38.1 0)
+		(at 250.19 102.87 0)
 		(unit 1)
 		(exclude_from_sim no)
 		(in_bom yes)
@@ -4252,7 +4572,7 @@
 		(fields_autoplaced yes)
 		(uuid "601508eb-8144-44bc-832d-1c8814376e44")
 		(property "Reference" "U5"
-			(at 328.93 24.13 0)
+			(at 250.19 88.9 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4260,7 +4580,7 @@
 			)
 		)
 		(property "Value" "~"
-			(at 328.93 20.32 0)
+			(at 250.19 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4268,7 +4588,7 @@
 			)
 		)
 		(property "Footprint" "Espressif:ESP32-C3-SuperMini_PLUS"
-			(at 328.93 20.32 0)
+			(at 250.19 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4277,7 +4597,7 @@
 			)
 		)
 		(property "Datasheet" ""
-			(at 328.93 20.32 0)
+			(at 250.19 85.09 0)
 			(effects
 				(font
 					(size 1.27 1.27)
@@ -4286,7 +4606,7 @@
 			)
 		)
 		(property "Description" ""
-			(at 328.93 38.1 0)
+			(at 250.19 102.87 0)
 			(effects
 				(font
 					(size 1.27 1.27)

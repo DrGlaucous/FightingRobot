@@ -29,14 +29,15 @@ void TransmitterHandler::update()
     //controller->update();
 
 
-    //TEST: send a spoof packet
-    if(TimerHandler::DeltaTimeMillis(&last_time, 1000)) {
-        remote_control_packet_t outbox = remote_control_packet_t{};
-        outbox.channels.analog_channels[0] = 64;
-        radio->SendPacket(outbox);
-        Serial.printf("sent\n");
-    }
-    return;
+    // //TEST: send a spoof packet
+    // if(TimerHandler::DeltaTimeMillis(&last_time, 1000)) {
+    //     remote_control_packet_t outbox = remote_control_packet_t{};
+    //     outbox.channels.analog_channels[0] = 64;
+    //     radio->SendPacket(outbox);
+    //     Serial.printf("sent\n");
+    // }
+    // return;
+
 
 
     //instead, send at the soonest update opportunity (first stable packet collected)
